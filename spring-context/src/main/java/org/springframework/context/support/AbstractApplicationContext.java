@@ -525,30 +525,39 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareBeanFactory(beanFactory);
 
 			try {
+				//此方法留给子类去实现
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
 
+				//调用我们的bean工厂的后置处理器(BeanFactoryPostProcessor)(非常的重要)
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
+				//调用我们的BeanPostProcessor后置处理器
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
 
+				//初始化国际化资源处理器
 				// Initialize message source for this context.
 				initMessageSource();
 
+				//创建事件多播器
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
+				//这个类是留给子类实现的，其中springboot也是从这个方法启动Tomcat的
 				// Initialize other special beans in specific context subclasses.
 				onRefresh();
 
+				//把我们的事件监听器注册到多播器上
 				// Check for listener beans and register them.
 				registerListeners();
 
+				//实例化我们剩余的单实例bean(这个方法非常的重要)
 				// Instantiate all remaining (non-lazy-init) singletons.
 				finishBeanFactoryInitialization(beanFactory);
 
+				//最后容器刷新，发布新事件(spring cloud也是从这里启动的)
 				// Last step: publish corresponding event.
 				finishRefresh();
 			}
@@ -862,6 +871,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
+		//处理关于aspectj
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
@@ -871,6 +881,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Stop using the temporary ClassLoader for type matching.
 		beanFactory.setTempClassLoader(null);
 
+		//冻结所有的bean定义，说明注册的bean定义将不能被修改或进一步的处理
 		// Allow for caching all bean definition metadata, not expecting further changes.
 		beanFactory.freezeConfiguration();
 

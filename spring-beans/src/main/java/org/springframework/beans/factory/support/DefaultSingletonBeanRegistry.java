@@ -73,13 +73,21 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Maximum number of suppressed exceptions to preserve. */
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
-
+	/**
+	 * 一级缓存：这个就是我们大名鼎鼎的单例池，用于保存我们所有的单实例bean
+	 */
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
+	/**
+	 * 三级缓存：该map缓存的key为beanName,value为ObjectFactory(包装为早期对象)
+	 */
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
+	/**
+	 * 二级缓存：用于缓存我们的key为beanName,value是我们的早期对象（对象属性还没有来得及赋值）
+	 */
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
@@ -178,7 +186,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		/**
+		 * 第一步：尝试去一级缓存中获取(单例缓存池中去获取对象，一般情况下从该map中获取的bean可以直接使用)
+		 * IOC容器初始化加载单实例bean的时候第一次进入，此时map一般返回空。
+		 */
 		Object singletonObject = this.singletonObjects.get(beanName);
+		/**
+		 * 如果没有从一级缓存中没有获取到bean,并且isSingletonCurrentlyInCreation这个list包含该beanName,
+		 * IOC容器初始化加载单实例bean的时候第一次进入，此时list为空，但是循环依赖的时候满足这个条件。
+		 */
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				singletonObject = this.earlySingletonObjects.get(beanName);

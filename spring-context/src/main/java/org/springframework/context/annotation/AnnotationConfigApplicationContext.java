@@ -52,13 +52,24 @@ import org.springframework.util.Assert;
  * @see org.springframework.context.support.GenericXmlApplicationContext
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
-
+	/**
+	 * bean定义的读取器
+	 */
 	private final AnnotatedBeanDefinitionReader reader;
-
+	/**
+	 * 类路径下bean定义的扫描器
+	 */
 	private final ClassPathBeanDefinitionScanner scanner;
 
 
 	/**
+	 * 因为AnnotationConfigApplicationContext继承了GenericApplicationContext，所以
+	 * 它会首先调用父类GenericApplicationContext的无参构造方法，而父类GenericApplicationContext的
+	 * 无参构造方法初始化了一个BeanFactory，所有ApplicationContext和BeanFactory是一个组合关系。
+	 * 此构造方法主要完成了三件重要的事情
+	 * 1）实例化了DefaultListableBeanFactory对象（调用父类的午餐构造方法）
+	 * 2）实例化了AnnotatedBeanDefinitionReader对象（bean定义的读取器）
+	 * 3）实例化了ClassPathBeanDefinitionScanner对象（类路径下bean定义的扫描器）
 	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
@@ -78,6 +89,14 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	}
 
 	/**
+	 * 1)、this();
+	 *    1）实例化了DefaultListableBeanFactory对象（调用父类的午餐构造方法）
+	 * 	  2）实例化了AnnotatedBeanDefinitionReader对象（bean定义的读取器）
+	 * 	  3）实例化了ClassPathBeanDefinitionScanner对象（类路径下bean定义的扫描器）
+	 * 2)register();
+	 *
+	 * 3)refresh();
+	 *
 	 * Create a new AnnotationConfigApplicationContext, deriving bean definitions
 	 * from the given component classes and automatically refreshing the context.
 	 * @param componentClasses one or more component classes &mdash; for example,
