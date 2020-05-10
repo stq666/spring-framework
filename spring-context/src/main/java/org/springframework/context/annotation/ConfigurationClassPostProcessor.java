@@ -119,9 +119,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory();
 
 	private boolean setMetadataReaderFactoryCalled = false;
-
+	/**
+	 * 存储实现了BeanDefinitionRegistryPostProcessor接口对象的id
+	 *  1)其中BeanDefinitionRegistryPostProcessor继承了父接口BeanFactoryPostProcessor
+	 */
 	private final Set<Integer> registriesPostProcessed = new HashSet<>();
-
+	/**
+	 * 存储实现了BeanFactoryPostProcessor接口的对象的id
+	 */
 	private final Set<Integer> factoriesPostProcessed = new HashSet<>();
 
 	@Nullable
@@ -218,15 +223,23 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 
 	/**
+	 *
 	 * Derive further bean definitions from the configuration classes in the registry.
 	 */
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 		int registryId = System.identityHashCode(registry);
+		/**
+		 * 判断存储了BeanDefinitionRegistryPostProcessor对象的hashid缓存中是否已经存在，
+		 * 如果存在，则抛出异常
+		 */
 		if (this.registriesPostProcessed.contains(registryId)) {
 			throw new IllegalStateException(
 					"postProcessBeanDefinitionRegistry already called on this post-processor against " + registry);
 		}
+		/**
+		 * 判断存储了BeanFactoryPostProcessor对象的hashid缓存中是否已经存在，
+		 */
 		if (this.factoriesPostProcessed.contains(registryId)) {
 			throw new IllegalStateException(
 					"postProcessBeanFactory already called on this post-processor against " + registry);
@@ -264,25 +277,35 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
+		/**
+		 * 这一步作用：获取beanDefinitionMap中所有的beanName
+		 */
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
 		for (String beanName : candidateNames) {
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
+
 			if (beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE) != null) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
+			/**
+			 * 判断指定对象上是否有@Configuration注解，
+			 * 如果有，则添加到list集合中
+			 */
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
 		}
-
+		/**
+		 * 如果在所有的类上没有发现@Configuration注解，则直接返回
+		 */
 		// Return immediately if no @Configuration classes were found
 		if (configCandidates.isEmpty()) {
 			return;
 		}
-
+		//如果类上加了@Order，则对加上@Configuration注解的所有类机型排序
 		// Sort by previously determined @Order value, if applicable
 		configCandidates.sort((bd1, bd2) -> {
 			int i1 = ConfigurationClassUtils.getOrder(bd1.getBeanDefinition());

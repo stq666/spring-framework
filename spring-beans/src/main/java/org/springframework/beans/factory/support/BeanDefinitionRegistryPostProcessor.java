@@ -33,6 +33,15 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProcessor {
 
 	/**
+	 * 标准初始化后能够修改spring应用上下文的bean定义信息，所有的常规的bean的definition信息已经
+	 * 加载完成，但是所有的bean都没有被实例化，在进一步处理此对象对应的BeanDefinition信息之前，
+	 * 你能够对BeanDefinition进行修改。
+	 * 总结一句话就是：你可以在一个对象实例化之前对这个对象对应的BeanDefinition进行修改。
+	 * 可以看一下这个方法的参数BeanDefinitionRegistry：注册BeanDefinition到一个beanDefinitionMap中。
+	 * 1）他有一个方法，能够将BeanDefinition注册到beanDefinitionMap中
+	 *  registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+	 *  所有我们可以把修改的BeanDefinition重新注册到beanDefinitionMap中去
+	 *
 	 * Modify the application context's internal bean definition registry after its
 	 * standard initialization. All regular bean definitions will have been loaded,
 	 * but no beans will have been instantiated yet. This allows for adding further

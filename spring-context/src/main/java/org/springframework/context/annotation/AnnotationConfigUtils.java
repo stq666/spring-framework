@@ -138,6 +138,16 @@ public abstract class AnnotationConfigUtils {
 	}
 
 	/**
+	 * 这个方法的主要作用：注册所有的与注解相关的后置处理器
+	 * 1）ConfigurationClassPostProcessor：使用bean工厂后置处理器解析@Configurantion
+	 *    -->BeanDefinitionRegistryPostProcessor--> BeanFactoryPostProcessor
+	 * 2）AutowiredAnnotationBeanPostProcessor：使用bean后置处理器解析@Autowired/@Value/@Inject
+	 *    -->SmartInstantiationAwareBeanPostProcessor--->InstantiationAwareBeanPostProcessor
+	 *    -->BeanPostProcessor
+	 * 3）CommonAnnotationBeanPostProcessor：使用bean后置处理器解析@PostConstruct/PreDestroy
+	 * 4）PersistenceAnnotationBeanPostProcessor：
+	 * 5）EventListenerMethodProcessor
+	 * 6）DefaultEventListenerFactory
 	 * Register all relevant annotation post processors in the given registry.
 	 * @param registry the registry to operate on
 	 * @param source the configuration source element (already extracted)

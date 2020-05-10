@@ -94,7 +94,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * 	  2）实例化了AnnotatedBeanDefinitionReader对象（bean定义的读取器）
 	 * 	  3）实例化了ClassPathBeanDefinitionScanner对象（类路径下bean定义的扫描器）
 	 * 2)register();
-	 *
+	 *   将指定的对象注册到beanDefinitionMap集合中去。
 	 * 3)refresh();
 	 *
 	 * Create a new AnnotationConfigApplicationContext, deriving bean definitions
