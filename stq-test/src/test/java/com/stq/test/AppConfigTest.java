@@ -14,4 +14,5 @@ public class AppConfigTest {
 		AppConfig bean = applicationContext.getBean(AppConfig.class);
 		System.out.println(bean);
 	}
+
 }

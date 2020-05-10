@@ -22,6 +22,11 @@ import org.springframework.core.type.MethodMetadata;
 import org.springframework.lang.Nullable;
 
 /**
+ * 这是Bean Definition的子接口，他的主要作用就是能够暴漏一个AnnotationMetadata
+ * 主要有3个实现：
+ * 1）AnnotatedGenericBeanDefinition
+ * 2）ConfigurationClassBeanDefinition
+ * 3）ScannedGenericBeanDefinition
  * Extended {@link org.springframework.beans.factory.config.BeanDefinition}
  * interface that exposes {@link org.springframework.core.type.AnnotationMetadata}
  * about its bean class - without requiring the class to be loaded yet.
@@ -34,6 +39,7 @@ import org.springframework.lang.Nullable;
 public interface AnnotatedBeanDefinition extends BeanDefinition {
 
 	/**
+	 * 获取该bean注解的元数据
 	 * Obtain the annotation metadata (as well as basic class metadata)
 	 * for this bean definition's bean class.
 	 * @return the annotation metadata object (never {@code null})

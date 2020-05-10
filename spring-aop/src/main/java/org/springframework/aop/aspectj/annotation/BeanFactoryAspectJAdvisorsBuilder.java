@@ -89,22 +89,40 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 				if (aspectNames == null) {
 					List<Advisor> advisors = new ArrayList<>();
 					aspectNames = new ArrayList<>();
+					/**
+					 * aop功能中在这里传入的是Object对象，代表去容器中获取到所有的组件名称，然后再
+					 * 经过一一的遍历，这个过程十分的消耗性能，所以spring会在这里加入保存切面信息的缓存。
+					 * 但是事务功能不一样，事务模块的功能是直接去容器中获取Advisor类型的，选择返回小且
+					 * 不消耗性能，所以spring在事务模块没有加入缓存来保存我们的事务相关的Advisor
+					 */
 					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 							this.beanFactory, Object.class, true, false);
+					/**
+					 * 遍历容器中所有的beanName
+					 */
 					for (String beanName : beanNames) {
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}
 						// We must be careful not to instantiate beans eagerly as in this case they
 						// would be cached by the Spring container but would not have been weaved.
+						/**
+						 * 通过beanName获取到对应的class对象
+						 */
 						Class<?> beanType = this.beanFactory.getType(beanName);
 						if (beanType == null) {
 							continue;
 						}
+						/**
+						 * 根据class对象判断是不是切面
+						 */
 						if (this.advisorFactory.isAspect(beanType)) {
+							//如果是切面则加入到缓存中
 							aspectNames.add(beanName);
+							//把beanName和class对象构建成一个Aspect Metadata
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
+								//构建切面注解的实例工厂
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
