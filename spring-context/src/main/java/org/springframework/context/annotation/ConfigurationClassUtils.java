@@ -74,6 +74,7 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
+	 * 检查被给的beanDefinition是否是Configuration对象，
 	 * Check whether the given bean definition is a candidate for a configuration class
 	 * (or a nested component class declared within a configuration/component class,
 	 * to be auto-registered as well), and mark it accordingly.

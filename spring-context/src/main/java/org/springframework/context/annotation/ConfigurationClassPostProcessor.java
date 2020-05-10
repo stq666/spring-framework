@@ -66,6 +66,18 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 1)这个类是一个bean工厂后置处理器:BeanDefinitionRegistryPostProcessor-->BeanFactoryPostProcessor
+ * 2)执行时机：
+ *    1)refresh()-->invokeBeanFactoryPostProcessors(beanFactory)
+ *    2)因为此类实现了PriorityOrdered接口，所以会首先执行，
+ *    具体请查看PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors()方法
+ * 3)这个bean工厂后置处理器优先于其他bean被注册
+ * 既然这个类是BeanDefinitionRegistryPostProcessor,那么它就有两个重要的方法
+ * 1）postProcessBeanDefinitionRegistry():这个方法会扫描所有的类，然后注册到beanDefinitionMap集合中
+ * 2）postProcessBeanFactory()：这个方法会将有注解@Configuration的类（如AppConfig）通过cglib变成代理类。
+ *
+ *
+ * 用于解析@Configuration
  * {@link BeanFactoryPostProcessor} used for bootstrapping processing of
  * {@link Configuration @Configuration} classes.
  *
@@ -223,6 +235,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 
 	/**
+	 * 这个方法是BeanDefinitionRegistryPostProcessor里面的方法，
+	 * 它优先于BeanFactoryPostProcessor中的postProcessBeanFactory()方法执行
 	 *
 	 * Derive further bean definitions from the configuration classes in the registry.
 	 */
@@ -272,6 +286,24 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
+	 * 在初始化AnnotationApplicationContext时
+	 * 第一步：this()-->new AnnotatedBeanDefinitionReader(this)
+	 *    -->AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry)
+	 *    -->registerAnnotationConfigProcessors()
+	 *    这个调用链会像beanDefinitionMap集合中注册6个类，分别如下：
+	 *    1）ConfigurationClassPostProcessor
+	 *    2）AutowiredAnnotationBeanPostProcessor
+	 *    3）CommonAnnotationBeanPostProcessor
+	 *    4）PersistenceAnnotationBeanPostProcessor
+	 *    5）EventListenerMethodProcessor
+	 *    6）DefaultEventListenerFactory
+	 * 第二步：register(Class):注册了一个类（这个类注解@Configuration）,如我们实例中的AppConfig.
+	 *    7)appConfig.
+	 * 下面方法中的candidateNames数组就是获取上面的7个类。
+	 * 1）查找有注解@Configuration的类，然后将找到的添加到configCandidates的集合中（其实就是查找到我们的AppConfig）
+	 * 2）通过do{}while(!candidates.isEmpty())解析所有的对象将其封装成BeanDefinition对象，
+	 * 然后添加到beanFactoryMap集合中。
+	 *
 	 * Build and validate a configuration model based on the registry of
 	 * {@link Configuration} classes.
 	 */
@@ -291,7 +323,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				}
 			}
 			/**
-			 * 判断指定对象上是否有@Configuration注解，
+			 * 判断指定对象上是否有@Configuration注解，(例如我们自定义的AppConfig)
+			 * @Configuration    -->checkConfigurationClassCandidate方法就是验证类上是否有@Configuration注解。
+			 * @ComponentScan("com.stq")
+			 * public class AppConfig {
+			 * }
 			 * 如果有，则添加到list集合中
 			 */
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
