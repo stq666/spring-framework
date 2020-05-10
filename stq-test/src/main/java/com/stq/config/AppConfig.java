@@ -1,5 +1,6 @@
 package com.stq.config;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -7,5 +8,6 @@ import org.springframework.context.annotation.Configuration;
  * @date 2020-05-09 21:12
  */
 @Configuration
+@ComponentScan("com.stq")
 public class AppConfig {
 }

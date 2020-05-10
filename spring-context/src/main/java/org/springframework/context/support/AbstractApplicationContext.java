@@ -512,52 +512,95 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
+	/**
+	 * 此方法是spring启动的核心逻辑，总共分为12步，其中第5步和第11步最为重要
+	 * 第5步：调用所有的bean工厂后置处理器进行实例化前的各项工作，如扫描/注册BeanDefinitioan到beanDefinitionMap中
+	 * 第11步：所有的单实例bean的实例化过程都是在这一步
+	 * @throws BeansException
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
+			/**
+			 * 第1步：刷新钱的准备
+			 * 1）记录开始时间
+			 * 2）添加属性资源到环境变量中（空方法，子类实现）
+			 * 3）验证上述的属性资源是否合法
+			 */
 			// Prepare this context for refreshing.
 			prepareRefresh();
-
+			/**
+			 * 第2步：刷新并获取beanFactory
+			 *  1）刷新beanFactory,就是this.beanFactory.setSerializationId(getId());
+			 *  2）获取beanFactory,this.beanFactory;
+			 *  这个bean工厂其实在调用refresh()方法前已经被创建好了
+			 *    this()；
+			 *      -->父类GenericApplicationContext的无参构造方法
+			 *      this.beanFactory = new DefaultListableBeanFactory();
+			 */
 			// Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
-
+			/**
+			 * 第3步：准备beanFactory的其他信息
+			 * 1）增加类加载器
+			 * 2）设置表达式的解析器：StandardBeanExpressionResolver
+			 * 3）设置资源的注册器：ResourceEditorRegistrar
+			 * 4）设置一个bean后置处理器：ApplicationContextAwareProcessor，
+			 * 5）
+			 */
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
 
 			try {
-				//此方法留给子类去实现
+				/**
+				 * 第4步：此方法留给子类去实现
+				 */
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
-
-				//调用我们的bean工厂的后置处理器(BeanFactoryPostProcessor)(非常的重要)
+				/**
+				 * 第5步：调用我们的bean工厂的后置处理器(BeanFactoryPostProcessor)(非常的重要)
+				 */
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
-
-				//调用我们的BeanPostProcessor后置处理器
+				/**
+				 * 第6步：注册BeanPostProcessor后置处理器
+				 */
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
-
-				//初始化国际化资源处理器
+				/**
+				 * 第7步：初始化国际化资源处理器
+				 */
 				// Initialize message source for this context.
 				initMessageSource();
 
-				//创建事件多播器
+				/**
+				 * 第8步：创建事件多播器
+				 */
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
-				//这个类是留给子类实现的，其中springboot也是从这个方法启动Tomcat的
+				/**
+				 * 第9步：这个类是留给子类实现的，其中springboot也是从这个方法启动Tomcat的
+				 */
 				// Initialize other special beans in specific context subclasses.
 				onRefresh();
 
-				//把我们的事件监听器注册到多播器上
+				/**
+				 * 第10步：把我们的事件监听器注册到多播器上
+				 */
 				// Check for listener beans and register them.
 				registerListeners();
 
-				//实例化我们剩余的单实例bean(这个方法非常的重要)
+				/**
+				 * 第11步：实例化我们剩余的单实例bean(这个方法非常的重要)
+				 */
 				// Instantiate all remaining (non-lazy-init) singletons.
 				finishBeanFactoryInitialization(beanFactory);
 
-				//最后容器刷新，发布新事件(spring cloud也是从这里启动的)
+				/**
+				 * 第12步：最后容器刷新，发布新事件(spring cloud也是从这里启动的)
+				 */
 				// Last step: publish corresponding event.
 				finishRefresh();
 			}
