@@ -599,6 +599,42 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				/**
 				 * 第11步：实例化我们剩余的单实例bean(这个方法非常的重要)
+				 * spring bean简单的生命周期
+				 * 1）推断构造方法
+				 * 2）利用反射new对象
+				 * 3）缓存注解信息，解析合并后的BeanDefinition
+				 * 4)提前暴露一个工厂
+				 * 5）判断是否需要完成属性注入
+				 * 6）完成属性注入（这个阶段会出现循环依赖的情况）
+				 * 7）回调Aware接口
+				 * 8）调用生命周期回调方法
+				 * 9）完成代理--aop
+				 * 10）put单例池容器
+				 * 11）销毁这个对象
+				 * 对于循环依赖如下说明：
+				 * 首先说一下循环依赖的三级缓存：
+				 * 1）一级缓存：singletonObjects:我们所说的单例池，Map<String, Object> singletonObjects
+				 * 2）二级缓存：earlySingletonObjects：Map<String, Object> earlySingletonObjects
+				 * 3）三级缓存：singletonFactories：就是提前暴露的工厂，Map<String, ObjectFactory<?>> singletonFactories
+				 *
+				 * 举例如下
+				 * public X{                  public Y {
+				 * 	@Autowired                  @Autowired
+				 * 	private Y y;	            private X x;
+				 * }                          }
+				 *   --->1)getBean(X)
+				 *   --->2)getSingleton(X)
+				 *   --->3)new X()
+				 *   --->4)new X()对象后，会将创建的对象放到三级缓存中去
+				 *   --->5)Autowired Y
+				 *   --->6)getBean(Y)
+				 *   --->7)new Y()
+				 *   --->8)Autowired X   (这一步我们知道X已经提前暴露了一个ObjectFactory工厂，把这个工厂添加到三级缓存中)
+				 *         8.1)此时会调用getSingleton()方法，从三级缓存中找到
+				 *   --->9)end Y (能够将第8步获取的X填充给Y)
+				 *   --->10)创建Y结束后，返回5）
+				 *   --->11)end X
+				 * 这样就完成了循环依赖
 				 */
 				// Instantiate all remaining (non-lazy-init) singletons.
 				finishBeanFactoryInitialization(beanFactory);
