@@ -152,6 +152,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 将提前暴露的工厂添加到三级缓存中去
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
@@ -194,6 +195,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		/**
 		 * 如果没有从一级缓存中没有获取到bean,并且isSingletonCurrentlyInCreation这个list包含该beanName,
 		 * IOC容器初始化加载单实例bean的时候第一次进入，此时list为空，但是循环依赖的时候满足这个条件。
+		 * 1)如果从一级缓存中没有获取的依赖的bean,那么尝试从二级缓存中获取
+		 * 2）如果二级缓存中仍没有，则尝试从三级缓存中获取
+		 *    2.1）如果三级缓存中有，则从三级缓存获取后添加到二级缓存中，然后从三级缓存中删除
+		 *    2.2）如果三级缓存中没有，则new对象，然后暴露一个工厂存放到三级缓存
+		 * 3）为什么会有二级缓存呢？直接从三级缓存中获取不就可以了吗？
+		 *   因为三级缓存存放的是一个工厂，这个工厂非常的重，每次获取都需要从工厂获取一个，这样对
+		 *   性能有所影响，所以为了性能方面的考虑，第一次new对象后暴露一个工厂存放在三级缓存中，
+		 *   如果再次getSingleton(),如果一级缓存没有，就直接从二级缓存中获取，不需要在用工厂生成了。
 		 */
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
