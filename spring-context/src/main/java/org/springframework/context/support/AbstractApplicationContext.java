@@ -902,6 +902,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 这个方法是最重要的，几乎所有的bean的实例化都是在这个方法实现的。
 	 * Finish the initialization of this context's bean factory,
 	 * initializing all remaining singleton beans.
 	 */

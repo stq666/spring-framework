@@ -509,6 +509,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			/**
+			 * 第1次调用后置处理器。这一步主要对aop的切面信息进行缓存
 			 * 通过bean的后置处理器来生成代理对象，一般情况下不会在这个地方生成代理对象。
 			 * 为什么不能生成代理对象，不管是我们的JDK动态代理还是cglib代理都不会在此进行代理，
 			 * 因为我们真实的对象还没有生成，所以不会在这里生成代理对象，那么在这一步是我们
@@ -569,8 +570,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
+			/**
+			 * 第2次调用后置处理器
+			 * 1）创建实例化对象
+			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
+		/**
+		 * 获取到的仅仅是通过反射获取的普通对象，还不是真正的Spring bean
+		 */
 		final Object bean = instanceWrapper.getWrappedInstance();
 		Class<?> beanType = instanceWrapper.getWrappedClass();
 		if (beanType != NullBean.class) {
@@ -581,6 +589,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
+					/**
+					 * 第3次调用后置处理器
+					 * 1）通过后置处理器来合并之后的BeanDefinition---目标
+					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
 				catch (Throwable ex) {
@@ -593,6 +605,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
+		//判断是否允许循环依赖
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
@@ -600,13 +613,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			/**
+			 * 第4次调用后置处理器，判断是否需要AOP
+			 * 这个方法会将单例对象添加到单例池singletonObjects集合中
+			 */
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
+			/**
+			 * 填充属性，也就是我们所说的自动注入
+			 * 里面会完成第5次和第6次的后置处理器调用
+			 */
 			populateBean(beanName, mbd, instanceWrapper);
+			/**
+			 * 初始化Spring bean对象，并执行各种aware
+			 * 里面会完成第7次和第8次的后置处理器调用
+			 */
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -964,6 +989,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 第四次调用后置处理器
 	 * Obtain a reference for early access to the specified bean,
 	 * typically for the purpose of resolving a circular reference.
 	 * @param beanName the name of the bean (for error handling purposes)
@@ -1095,6 +1121,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 第3次执行BeanPostProcessor
 	 * Apply MergedBeanDefinitionPostProcessors to the specified bean definition,
 	 * invoking their {@code postProcessMergedBeanDefinition} methods.
 	 * @param mbd the merged bean definition for the bean
@@ -1211,7 +1238,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				return instantiateBean(beanName, mbd);
 			}
 		}
-
+		/**
+		 * 第2次调用后置处理器就在determineConstructorsFromBeanPostProcessors()方法中，
+		 * 主要用于推断构造方法
+		 */
 		// Candidate constructors for autowiring?
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
@@ -1282,6 +1312,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 通过bean后置处理器推断出将要被实例化的对象的构造函数
+	 * 第2次执行bean后置处理器，SmartInstantiationAwareBeanPostProcessor
 	 * Determine candidate constructors to use for the given bean, checking all registered
 	 * {@link SmartInstantiationAwareBeanPostProcessor SmartInstantiationAwareBeanPostProcessors}.
 	 * @param beanClass the raw class of the bean
@@ -1771,6 +1803,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
+	 * 初始化Spring bean对象，详细流程如下：
+	 * 第一步：执行各种aware方法，但是并不是所有的XxxAware都执行：invokeAwareMethods()
+	 *        1）会执行实现了BeanNameAware接口的类
+	 *        2）会执行实现了BeanClassLoaderAware接口的类
+	 *        3）会执行实现了BeanFactoryAware接口的类
+	 *        举例如下：
+	 *        public class StqAware implements BeanFactoryAware {
+	 *        	@Override
+	 *    		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	 * 				//回调执行这个方法
+	 *    		}
+	 * 		 }
+	 * 第二步：执行后置处理器的postProcessBeforeInitialization()方法:applyBeanPostProcessorsBeforeInitialization()
+	 *        1）这一步也会执行相应的XxxAware回调
+	 * 第三步：执行初始化方法：invokeInitMethods()
+	 * 第四步：执行后置处理器的postProcessAfterInitialization()方法：applyBeanPostProcessorsAfterInitialization()
+	 *
 	 * Initialize the given bean instance, applying factory callbacks
 	 * as well as init methods and bean post processors.
 	 * <p>Called from {@link #createBean} for traditionally defined beans,
@@ -1800,10 +1849,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+			/**
+			 *  第9次执行后置处理器
+			 */
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			/**
+			 * 这个方法会执行两种初始化方法
+			 * 1）首先执行实现了InitializingBean()接口的类
+			 * 2）最后执行@Bean/xml中的init-method方法
+			 * 特别注意：@PostConstruct也是执行初始化方法，但是不会在这个方法中实现，它是在后置处理器中实现的。
+			 * 所以这3个初始化方法的执行顺序如下：
+			 * @PostConstruct>InitializingBean>init-method
+			 */
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {

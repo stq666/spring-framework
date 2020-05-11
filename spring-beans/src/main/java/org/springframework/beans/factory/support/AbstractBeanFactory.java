@@ -228,6 +228,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 这个方法是获取Spring bean的方法，不管是获取还是创建，都会执行这个方法
+	 * 1）如果单例池singletonObjets中已经存在，则获取
+	 * 2）如果单例池singletonObjets中不存在，则创建，真正创建的方法是createBean()
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 * @param name the name of the bean to retrieve
 	 * @param requiredType the required type of the bean to retrieve
