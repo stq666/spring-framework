@@ -564,7 +564,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
 				/**
-				 * 第6步：注册BeanPostProcessor后置处理器
+				 * 第6步：注册BeanPostProcessor后置处理器,将所有的BeanPostProcessor注册到
+				 * beanPostProcessors集合当中去。
+				 * 1）首先加入实现了PriorityOrdered接口的BeanPostProcessor
+				 * 2）再次添加实现了Ordered接口的BeanPostProcessor
+				 * 3）第三添加既没有实现PriorityOrdered，也没有实现Ordered的BeanPostProcessor
+				 * 4）最后添加实现MergedBeanDefinitionPostProcessor接口的
 				 */
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
@@ -766,6 +771,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 注册所有的BeanPostProcessor
 	 * Instantiate and register all BeanPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before any instantiation of application beans.

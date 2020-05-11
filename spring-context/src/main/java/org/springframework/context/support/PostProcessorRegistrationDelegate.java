@@ -238,9 +238,25 @@ final class PostProcessorRegistrationDelegate {
 		beanFactory.clearMetadataCache();
 	}
 
+	/**
+	 * 此方法的功能：注册所有的BeanPostProcessor,
+	 *            把所有的BeanPostProcessor添加到一个beanPostProcessors集合中
+	 * 有四种类型的BeanPostProcessor需要排序
+	 * 1）查找出所有实现了PriorityOrdered接口的BeanPostProcessor添加到beanPostProcessors集合中
+	 * 2）查找出所有实现了Ordered接口的BeanPostProcessor添加到beanPostProcessors集合中
+	 * 3）查找出普通的（既没有实现PriorityOrdered,也没有实现Ordered）添加到beanPostProcessors集合中
+	 * 4）查找出实现了MergedBeanDefinitionPostProcessor接口，添加到beanPostProcessors集合中
+	 * 那么MergedBeanDefinitionPostProcessor是什么呢？
+	 *    MergedBeanDefinitionPostProcessor-->BeanPostProcessor
+	 * delegate
+	 * @param beanFactory
+	 * @param applicationContext
+	 */
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
-
+		/**
+		 * 首先获取所有的BeanPostProcessor
+		 */
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when

@@ -68,15 +68,15 @@ import org.springframework.util.ClassUtils;
 /**
  * 1)这个类是一个bean工厂后置处理器:BeanDefinitionRegistryPostProcessor-->BeanFactoryPostProcessor
  * 2)执行时机：
- *    1)refresh()-->invokeBeanFactoryPostProcessors(beanFactory)
- *    2)因为此类实现了PriorityOrdered接口，所以会首先执行，
- *    具体请查看PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors()方法
+ * 1)refresh()-->invokeBeanFactoryPostProcessors(beanFactory)
+ * 2)因为此类实现了PriorityOrdered接口，所以会首先执行，
+ * 具体请查看PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors()方法
  * 3)这个bean工厂后置处理器优先于其他bean被注册
  * 既然这个类是BeanDefinitionRegistryPostProcessor,那么它就有两个重要的方法
  * 1）postProcessBeanDefinitionRegistry():这个方法会扫描所有的类，然后注册到beanDefinitionMap集合中
  * 2）postProcessBeanFactory()：这个方法会将有注解@Configuration的类（如AppConfig）通过cglib变成代理类。
- *
- *
+ * <p>
+ * <p>
  * 用于解析@Configuration
  * {@link BeanFactoryPostProcessor} used for bootstrapping processing of
  * {@link Configuration @Configuration} classes.
@@ -104,15 +104,15 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * {@link #setBeanNameGenerator}. Note that the default for component scanning purposes
 	 * is a plain {@link AnnotationBeanNameGenerator#INSTANCE}, unless overridden through
 	 * {@link #setBeanNameGenerator} with a unified user-level bean name generator.
-	 * @since 5.2
+	 *
 	 * @see #setBeanNameGenerator
+	 * @since 5.2
 	 */
 	public static final AnnotationBeanNameGenerator IMPORT_BEAN_NAME_GENERATOR =
 			new FullyQualifiedAnnotationBeanNameGenerator();
 
 	private static final String IMPORT_REGISTRY_BEAN_NAME =
 			ConfigurationClassPostProcessor.class.getName() + ".importRegistry";
-
 
 	private final Log logger = LogFactory.getLog(getClass());
 
@@ -133,7 +133,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	private boolean setMetadataReaderFactoryCalled = false;
 	/**
 	 * 存储实现了BeanDefinitionRegistryPostProcessor接口对象的id
-	 *  1)其中BeanDefinitionRegistryPostProcessor继承了父接口BeanFactoryPostProcessor
+	 * 1)其中BeanDefinitionRegistryPostProcessor继承了父接口BeanFactoryPostProcessor
 	 */
 	private final Set<Integer> registriesPostProcessed = new HashSet<>();
 	/**
@@ -151,7 +151,6 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	/* Using fully qualified class names as default bean names by default. */
 	private BeanNameGenerator importBeanNameGenerator = IMPORT_BEAN_NAME_GENERATOR;
-
 
 	@Override
 	public int getOrder() {
@@ -199,9 +198,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * standalone bean definition in XML, e.g. not using the dedicated {@code AnnotationConfig*}
 	 * application contexts or the {@code <context:annotation-config>} element. Any bean name
 	 * generator specified against the application context will take precedence over any set here.
-	 * @since 3.1.1
+	 *
 	 * @see AnnotationConfigApplicationContext#setBeanNameGenerator(BeanNameGenerator)
 	 * @see AnnotationConfigUtils#CONFIGURATION_BEAN_NAME_GENERATOR
+	 * @since 3.1.1
 	 */
 	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
 		Assert.notNull(beanNameGenerator, "BeanNameGenerator must not be null");
@@ -233,11 +233,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 	}
 
-
 	/**
 	 * 这个方法是BeanDefinitionRegistryPostProcessor里面的方法，
 	 * 它优先于BeanFactoryPostProcessor中的postProcessBeanFactory()方法执行
-	 *
+	 * <p>
 	 * Derive further bean definitions from the configuration classes in the registry.
 	 */
 	@Override
@@ -264,6 +263,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
+	 * 这个是一个bean工厂后置处理器方法，在spring容器启动时的第五步(invokeBeanFactoryPostProcessors())
+	 * 会首先调用BeanDefinitionRegistryPostProcessor.postProcessBeanDefinitionRegistry()方法，
+	 * 然后调用BeanFactoryPostProcessor.postProcessBeanFactory()。
+	 * 此方法的主要功能：
+	 * 将有注解@Configuration的类在实例化之前通过cglib代理技术将其变成代理类
 	 * Prepare the Configuration classes for servicing bean requests at runtime
 	 * by replacing them with CGLIB-enhanced subclasses.
 	 */
@@ -280,7 +284,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			// Simply call processConfigurationClasses lazily at this point then.
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
-
+		// TODO 利用cglib增强有注解@Configuration的类
 		enhanceConfigurationClasses(beanFactory);
 		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
 	}
@@ -288,22 +292,22 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * 在初始化AnnotationApplicationContext时
 	 * 第一步：this()-->new AnnotatedBeanDefinitionReader(this)
-	 *    -->AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry)
-	 *    -->registerAnnotationConfigProcessors()
-	 *    这个调用链会像beanDefinitionMap集合中注册6个类，分别如下：
-	 *    1）ConfigurationClassPostProcessor
-	 *    2）AutowiredAnnotationBeanPostProcessor
-	 *    3）CommonAnnotationBeanPostProcessor
-	 *    4）PersistenceAnnotationBeanPostProcessor
-	 *    5）EventListenerMethodProcessor
-	 *    6）DefaultEventListenerFactory
+	 * -->AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry)
+	 * -->registerAnnotationConfigProcessors()
+	 * 这个调用链会像beanDefinitionMap集合中注册6个类，分别如下：
+	 * 1）ConfigurationClassPostProcessor
+	 * 2）AutowiredAnnotationBeanPostProcessor
+	 * 3）CommonAnnotationBeanPostProcessor
+	 * 4）PersistenceAnnotationBeanPostProcessor
+	 * 5）EventListenerMethodProcessor
+	 * 6）DefaultEventListenerFactory
 	 * 第二步：register(Class):注册了一个类（这个类注解@Configuration）,如我们实例中的AppConfig.
-	 *    7)appConfig.
+	 * 7)appConfig.
 	 * 下面方法中的candidateNames数组就是获取上面的7个类。
 	 * 1）查找有注解@Configuration的类，然后将找到的添加到configCandidates的集合中（其实就是查找到我们的AppConfig）
 	 * 2）通过do{}while(!candidates.isEmpty())解析所有的对象将其封装成BeanDefinition对象，
 	 * 然后添加到beanFactoryMap集合中。
-	 *
+	 * <p>
 	 * Build and validate a configuration model based on the registry of
 	 * {@link Configuration} classes.
 	 */
@@ -428,6 +432,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * Post-processes a BeanFactory in search of Configuration class BeanDefinitions;
 	 * any candidates are then enhanced by a {@link ConfigurationClassEnhancer}.
 	 * Candidate status is determined by BeanDefinition attribute metadata.
+	 *
 	 * @see ConfigurationClassEnhancer
 	 */
 	public void enhanceConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
@@ -446,8 +451,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				if (!abd.hasBeanClass()) {
 					try {
 						abd.resolveBeanClass(this.beanClassLoader);
-					}
-					catch (Throwable ex) {
+					} catch (Throwable ex) {
 						throw new IllegalStateException(
 								"Cannot load configuration class: " + beanDef.getBeanClassName(), ex);
 					}
@@ -457,8 +461,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				if (!(beanDef instanceof AbstractBeanDefinition)) {
 					throw new BeanDefinitionStoreException("Cannot enhance @Configuration bean definition '" +
 							beanName + "' since it is not stored in an AbstractBeanDefinition subclass");
-				}
-				else if (logger.isInfoEnabled() && beanFactory.containsSingleton(beanName)) {
+				} else if (logger.isInfoEnabled() && beanFactory.containsSingleton(beanName)) {
 					logger.info("Cannot enhance @Configuration bean definition '" + beanName +
 							"' since its singleton instance has been created too early. The typical cause " +
 							"is a non-static @Bean method with a BeanDefinitionRegistryPostProcessor " +
@@ -489,7 +492,6 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			}
 		}
 	}
-
 
 	private static class ImportAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {
 
