@@ -14,8 +14,5 @@ public class Person {
 		System.out.println("Person构造方法...");
 	}
 
-	@PostConstruct
-	public void initMethod(){
 
-	}
 }

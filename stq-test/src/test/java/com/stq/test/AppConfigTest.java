@@ -1,10 +1,7 @@
 package com.stq.test;
 
-import com.stq.com.stq.model.Car;
-import com.stq.com.stq.model.Person;
 import com.stq.config.AppConfig;
-import org.junit.Test;
-import org.springframework.beans.factory.InitializingBean;
+import com.stq.service.IUserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -14,8 +11,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class AppConfigTest {
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-		Person  bean = applicationContext.getBean(Person.class);
-		System.out.println(bean);
+		IUserService bean = applicationContext.getBean(IUserService.class);
+		bean.getUserId();
 	}
 
 }

@@ -114,7 +114,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							continue;
 						}
 						/**
-						 * 根据class对象判断是不是切面
+						 * 根据class对象判断是不是切面，就是说当前类上是否有@Aspect注解
 						 */
 						if (this.advisorFactory.isAspect(beanType)) {
 							//如果是切面则加入到缓存中
