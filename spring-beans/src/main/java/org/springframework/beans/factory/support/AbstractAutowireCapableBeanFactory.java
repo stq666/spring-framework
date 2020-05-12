@@ -1147,6 +1147,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 第一次调用后置处理器: InstantiationAwareBeanPostProcessor ，
+	 * new对象之前调用
+	 *
 	 * Apply before-instantiation post-processors, resolving whether there is a
 	 * before-instantiation shortcut for the specified bean.
 	 * @param beanName the name of the bean
@@ -1834,7 +1837,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 *    		}
 	 * 		 }
 	 * 第二步：执行后置处理器的postProcessBeforeInitialization()方法:applyBeanPostProcessorsBeforeInitialization()
-	 *        1）这一步也会执行相应的XxxAware回调
+	 *        1）这一步也会执行相应的XxxAware回调( ApplicationContextAwareProcessor )
 	 * 第三步：执行初始化方法：invokeInitMethods()
 	 * 第四步：执行后置处理器的postProcessAfterInitialization()方法：applyBeanPostProcessorsAfterInitialization()
 	 *

@@ -23,6 +23,12 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.lang.Nullable;
 
 /**
+ * InstantionAwareBeanPostProcessor是BeanPostProcessor的子类
+ * 它的执行时机：new对象前后
+ * 1）postProcessBeforeInstantiation()在new对象前调用
+ * 2）postProcessAfterInstantiation()在new对象后调用，并且在填充属性前回调
+ * 用途：
+ * 1）禁止目标对象实例化，利用一个代理
  * Subinterface of {@link BeanPostProcessor} that adds a before-instantiation callback,
  * and a callback after instantiation but before explicit properties are set or
  * autowiring occurs.

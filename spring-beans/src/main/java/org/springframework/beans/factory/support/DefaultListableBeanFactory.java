@@ -858,6 +858,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return (this.configurationFrozen || super.isBeanEligibleForMetadataCaching(beanName));
 	}
 
+	/**
+	 * 此方法是真正实例化所有单实例bean的核心逻辑，主要包含两个for循环
+	 * 1）
+	 * 2）
+	 * @throws BeansException
+	 */
 	@Override
 	public void preInstantiateSingletons() throws BeansException {
 		if (logger.isTraceEnabled()) {
@@ -870,7 +876,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
+			// ？？？
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			/**
+			 * 三重判断必须满足
+			 * 1）必须是非抽象的
+			 * 2）必须是单实例的
+			 * 3）必须是非懒加载的
+			 * 满足上面三个条件后，此方法主要有两个分支
+			 * 1. 如果当前类是FactoryBean类型,然后在通过两个条件判断当前FactoryBean是否需要实例化
+			 *    1.1）当前FactoryBean必须实现的是 SmartFactoryBean (FactoryBean的子接口，总是返回单实例bean)
+			 *    1.2) 当前FactoryBean期望立即被初始化。
+			 * 2. 当前对象不是Factory类型：直接调用getBean()
+			 */
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);

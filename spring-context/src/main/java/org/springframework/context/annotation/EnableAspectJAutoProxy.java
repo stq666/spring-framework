@@ -111,6 +111,10 @@ import java.lang.annotation.Target;
  * While that dependency is optional for {@code spring-aop} in general, it is required
  * for {@code @EnableAspectJAutoProxy} and its underlying facilities.
  *
+ * 如果一个类中添加了这个注解，说明开启了aspectJ。
+ * 在它的注解上有@Import(AspectJAutoProxyRegistrar.class)，所以核心逻辑
+ * 在AspectJAutoProxyRegistrar类中。
+ *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
@@ -123,12 +127,15 @@ import java.lang.annotation.Target;
 public @interface EnableAspectJAutoProxy {
 
 	/**
+	 * 如果为true，则强制使用CGLIB动态代理，默认为false
 	 * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed
 	 * to standard Java interface-based proxies. The default is {@code false}.
 	 */
 	boolean proxyTargetClass() default false;
 
 	/**
+	 * 在目标对象内部自我调用，则无法实施切面的增强，
+	 * 如果为true，则可以通过AopContext获取到代理对象，默认为false
 	 * Indicate that the proxy should be exposed by the AOP framework as a {@code ThreadLocal}
 	 * for retrieval via the {@link org.springframework.aop.framework.AopContext} class.
 	 * Off by default, i.e. no guarantees that {@code AopContext} access will work.

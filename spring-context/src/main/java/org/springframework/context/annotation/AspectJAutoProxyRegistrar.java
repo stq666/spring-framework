@@ -22,6 +22,16 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
+ * 这个类是通过@Import()引入的，说明它会像spring容器中注册一个AnnotationAwareAspectJAutoProxyCreator类，
+ * 而 AnnotationAwareAspectJAutoProxyCreator的继承结构如下
+ *     AnnotationAwareAspectJAutoProxyCreator
+ *        -->AspectJAwareAdvisorAutoProxyCreator
+ *           -->AbstractAdvisorAutoProxyCreator
+ *              -->AbstractAutoProxyCreator
+ *                 -->SmartInstantiationAwareBeanPostProcessor
+ *                    -->InstantiationAwareBeanPostProcessor
+ *                       -->BeanPostProcessor
+ *  所以这个类其实就是一个后置处理器，
  * Registers an {@link org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
  * AnnotationAwareAspectJAutoProxyCreator} against the current {@link BeanDefinitionRegistry}
  * as appropriate based on a given @{@link EnableAspectJAutoProxy} annotation.

@@ -4,6 +4,7 @@ import com.stq.com.stq.model.Car;
 import com.stq.com.stq.model.Person;
 import com.stq.config.AppConfig;
 import org.junit.Test;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**

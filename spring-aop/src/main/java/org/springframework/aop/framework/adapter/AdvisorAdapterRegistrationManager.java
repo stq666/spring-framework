@@ -33,7 +33,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * @see #setAdvisorAdapterRegistry
  * @see AdvisorAdapter
  */
-public class AdvisorAdapterRegistrationManager implements BeanPostProcessor {
+public class  AdvisorAdapterRegistrationManager implements BeanPostProcessor {
 
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 

@@ -34,6 +34,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringValueResolver;
 
 /**
+ * 这是一个后置处理器，主要作用是初始化前回调实现了XxxAware接口的对象的方法
+ * 1）回调实现接口 EnvironmentAware 的setEnvironment(Environment environment);
+ * 2）回调实现接口 EmbeddedValueResolverAware setEmbeddedValueResolver(StringValueResolver resolver)
+ * 2）回调实现接口 ResourceLoaderAware 的setResourceLoader(ResourceLoader resourceLoader)
+ * 2）回调实现接口 ApplicationEventPublisherAware 的setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher)
+ * 2）回调实现接口 MessageSourceAware 的 setMessageSource(MessageSource messageSource)
+ * 2）回调实现接口 ApplicationContextAware 的 setApplicationContext(ApplicationContext applicationContext)
  * {@link BeanPostProcessor} implementation that supplies the {@code ApplicationContext},
  * {@link org.springframework.core.env.Environment Environment}, or
  * {@link StringValueResolver} for the {@code ApplicationContext} to beans that

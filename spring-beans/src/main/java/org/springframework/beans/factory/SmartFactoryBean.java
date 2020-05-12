@@ -17,6 +17,7 @@
 package org.springframework.beans.factory;
 
 /**
+ * 扩展FactoryBean接口，如果实现了SmartFactoryBean则总是返回单实例的bean
  * Extension of the {@link FactoryBean} interface. Implementations may
  * indicate whether they always return independent instances, for the
  * case where their {@link #isSingleton()} implementation returning
