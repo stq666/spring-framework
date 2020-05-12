@@ -573,6 +573,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			/**
 			 * 第2次调用后置处理器
 			 * 1）创建实例化对象
+			 * 创建bean实例，并将实例包裹在 BeanWrapper 实现类对象中返回，
+			 * createInstance中包含三种创建bean实例的方式：
+			 * 1. 通过工厂方法创建bean实例
+			 * 2. 通过构造方法自动注入（autowire by constructor）的方式创建bean实例
+			 * 3. 通过无参构造方法创建 bean 实例
+			 *
+			 * 若 bean 的配置信息中配置了 lookup-method 和 replace-method , 则会使用
+			 * CGLIB 增强bean实例。
 			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
@@ -1190,6 +1198,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 此方法有3中方法创建bean实例：
+	 *
+	 * 1. 通过工厂方法创建bean实例
+	 * 2. 通过构造方法自动注入（autowire by constructor）的方式创建bean实例
+	 * 3. 通过无参构造方法创建 bean 实例
+	 *
+	 * 若 bean 的配置信息中配置了 lookup-method 和 replace-method , 则会使用
+	 * CGLIB 增强bean实例。
+	 *
 	 * Create a new instance for the specified bean, using an appropriate instantiation strategy:
 	 * factory method, constructor autowiring, or simple instantiation.
 	 * @param beanName the name of the bean
@@ -1203,6 +1220,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
+		//首先从BeanDefinition获取到beanClass对象
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
