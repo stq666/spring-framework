@@ -1,4 +1,4 @@
-package com.stq.com.stq.model;
+package com.stq.model;
 
 /**
  * @author stqsht@163.com

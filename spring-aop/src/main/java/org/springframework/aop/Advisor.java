@@ -19,6 +19,9 @@ package org.springframework.aop;
 import org.aopalliance.aop.Advice;
 
 /**
+ * Advisor有两个子接口
+ * 1）IntroductionAdvisor
+ * 2）PointcutAdvisor：基于切入点
  * Base interface holding AOP <b>advice</b> (action to take at a joinpoint)
  * and a filter determining the applicability of the advice (such as
  * a pointcut). <i>This interface is not for use by Spring users, but to

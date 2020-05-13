@@ -195,6 +195,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Object singletonObject = this.singletonObjects.get(beanName);
 		/**
 		 * 如果没有从一级缓存中没有获取到bean,并且isSingletonCurrentlyInCreation这个list包含该beanName,
+		 * 也就是说如果单例池中没有，且查找的beanName正在创建中才能从二级或者三级缓存中获取，因为只有正在创建中的
+		 * 对象才具有二级/三级缓存。
 		 * IOC容器初始化加载单实例bean的时候第一次进入，此时list为空，但是循环依赖的时候满足这个条件。
 		 * 1)如果从一级缓存中没有获取的依赖的bean,那么尝试从二级缓存中获取
 		 * 2）如果二级缓存中仍没有，则尝试从三级缓存中获取

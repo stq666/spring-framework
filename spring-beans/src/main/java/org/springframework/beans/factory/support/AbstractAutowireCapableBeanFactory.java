@@ -623,7 +623,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			/**
 			 * 第4次调用后置处理器，判断是否需要AOP
-			 * 这个方法会将单例对象添加到单例池singletonObjects集合中
 			 */
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}

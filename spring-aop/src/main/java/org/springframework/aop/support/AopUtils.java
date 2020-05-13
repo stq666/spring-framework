@@ -295,6 +295,10 @@ public abstract class AopUtils {
 	}
 
 	/**
+	 * 从给定的通知集合中找到符合当前类的通知，主要分为两种通知的过滤
+	 * 1）IntroductionAdvisor
+	 * 2）PointcurAdvisor
+	 *
 	 * Determine the sublist of the {@code candidateAdvisors} list
 	 * that is applicable to the given class.
 	 * @param candidateAdvisors the Advisors to evaluate

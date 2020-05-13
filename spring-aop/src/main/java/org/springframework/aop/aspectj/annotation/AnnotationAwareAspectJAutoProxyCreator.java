@@ -86,9 +86,17 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	}
 
 	/**
-	 * 为了兼容xml和注解两种方式，获取增强，需要从两个方式获取
-	 * 1),通过xml获取，调用父类的findCandidateAdvisors()
-	 * 2）通过注解获取 this.aspectJAdvisorsBuilder.buildAspectJAdvisors()
+	 * 从两个方向查找到所有的增强
+	 * 1）从父类中查找所有事务的增强，主要是在事务时存在，如果没有事务则为空
+	 *    1.1）关于事务的增强并没有进行缓存，因为它是从beanDefinitionMap中查找到Advisor
+	 *    advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
+	 * 					this.beanFactory, Advisor.class, true, false);
+	 *
+	 * 2）从当前类中查找到所有关于AspectJ的增强。
+	 *    2.1）关于AspectJ的增强则进行了缓存advisorsCache，因为它是从beanDefinitionMap中查找Object
+	 *    String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
+	 * 							this.beanFactory, Object.class, true, false);
+	 *
 	 * @return
 	 */
 	@Override

@@ -101,6 +101,10 @@ public abstract class AopConfigUtils {
 	}
 
 	public static void forceAutoProxyCreatorToUseClassProxying(BeanDefinitionRegistry registry) {
+		/**
+		 * 首先判断beanDefinitionMap集合中是否包含key=AUTO_PROXY_CREATOR_BEAN_NAME的，
+		 * 一定会包含,因为第一步已经将AUTO_PROXY_CREATOR_BEAN_NAME注册到了beanDefinitionMap集合中
+		 */
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
 			BeanDefinition definition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
 			definition.getPropertyValues().add("proxyTargetClass", Boolean.TRUE);
@@ -108,6 +112,10 @@ public abstract class AopConfigUtils {
 	}
 
 	public static void forceAutoProxyCreatorToExposeProxy(BeanDefinitionRegistry registry) {
+		/**
+		 * 首先判断beanDefinitionMap集合中是否包含key=AUTO_PROXY_CREATOR_BEAN_NAME的，
+		 * 一定会包含,因为第一步已经将AUTO_PROXY_CREATOR_BEAN_NAME注册到了beanDefinitionMap集合中
+		 */
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
 			BeanDefinition definition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
 			definition.getPropertyValues().add("exposeProxy", Boolean.TRUE);

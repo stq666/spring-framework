@@ -520,7 +520,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @throws IllegalStateException
 	 */
 	@Override
-	public void refresh() throws BeansException, IllegalStateException {
+	public void  refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			/**
 			 * 第1步：刷新钱的准备
@@ -564,10 +564,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
 				/**
-				 * 第6步：注册BeanPostProcessor后置处理器,将所有的BeanPostProcessor注册到
-				 * beanPostProcessors集合当中去。
+				 * 第6步：注册BeanPostProcessor后置处理器
+				 * 第一步：循环查找出指定的BeanPostProcessor
+				 * 第二步：调用getBean()方法实例化BeanPostProcessor,就是将这个BeanPostProcessor实例化后
+				 *        添加到单力池singletonObjects(Map)集合中。
+				 * 第三步：将这个BeanPostProcessor实例化后添加到 beanPostProcessors (List)的缓存中
+				 *
+				 * 指定的后置处理器主要有以下四种顺序
 				 * 1）首先加入实现了PriorityOrdered接口的BeanPostProcessor
-				 * 2）再次添加实现了Ordered接口的BeanPostProcessor
+				 * 2）再次添加实现了Ordered接口的BeanPostProcessor,
 				 * 3）第三添加既没有实现PriorityOrdered，也没有实现Ordered的BeanPostProcessor
 				 * 4）最后添加实现MergedBeanDefinitionPostProcessor接口的
 				 */
