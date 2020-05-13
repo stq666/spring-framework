@@ -75,6 +75,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * 一级缓存：这个就是我们大名鼎鼎的单例池，用于保存我们所有的单实例bean
+	 * 主要存放两种类型的bean
+	 * 第一种：普通的原始bean
+	 * 第二种：代理bean
 	 */
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);

@@ -523,7 +523,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void  refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			/**
-			 * 第1步：刷新钱的准备
+			 * 第1步：刷新前的准备
 			 * 1）记录开始时间
 			 * 2）添加属性资源到环境变量中（空方法，子类实现）
 			 * 3）验证上述的属性资源是否合法
@@ -559,7 +559,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
 				/**
+				 *
 				 * 第5步：调用我们的bean工厂的后置处理器(BeanFactoryPostProcessor)(非常的重要)
+				 * 这一步会扫描和解析所有的类，并将解析到的类的信息封装到BeanDefinition对象中，
+				 * 然后将BeanDefinition存储到beanDefinitionMap集合中。
+				 *
+				 * 所有的BeanFactoryPostProcessor的在这一步添加到单例池的
 				 */
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
@@ -575,6 +580,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * 2）再次添加实现了Ordered接口的BeanPostProcessor,
 				 * 3）第三添加既没有实现PriorityOrdered，也没有实现Ordered的BeanPostProcessor
 				 * 4）最后添加实现MergedBeanDefinitionPostProcessor接口的
+				 *
+				 * 所有的BeanPostProcess在这一步添加到单例池的
 				 */
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
@@ -603,6 +610,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				/**
+				 * 第5步完成了对BeanFactoryPostProcessor对象的创建，然后存储到单例池中。
+				 * 第6步完成了对BeanPostProcessor对象的创建，然后存储到单例池中
 				 * 第11步：实例化我们剩余的单实例bean(这个方法非常的重要)
 				 * spring bean简单的生命周期
 				 * 1）推断构造方法
