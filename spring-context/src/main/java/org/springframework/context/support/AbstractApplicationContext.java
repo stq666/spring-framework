@@ -542,7 +542,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 			/**
-			 * 第3步：准备beanFactory的其他信息
+			 * TODO 还未分析透彻
+			 * 第3步：准备beanFactory的其他信息,增加了很多的信息，
 			 * 1）增加类加载器
 			 * 2）设置表达式的解析器：StandardBeanExpressionResolver
 			 * 3）设置资源的注册器：ResourceEditorRegistrar
@@ -554,7 +555,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			try {
 				/**
-				 * 第4步：此方法留给子类去实现
+				 * TODO 还未分析透彻
+				 * 第4步：此方法留给子类去实现，一般Web的ApplicationContext上下文会实现这个方法
 				 */
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
@@ -805,6 +807,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 实例化并执行所有的bean工厂后置处理器，这个方法其实就做了这些内容，但是执行的bean工厂后置处理器做了大量的
+	 * 工作。
+	 * 1）
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before singleton instantiation.

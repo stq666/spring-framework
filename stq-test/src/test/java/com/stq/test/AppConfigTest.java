@@ -1,7 +1,7 @@
 package com.stq.test;
 
-import com.stq.config.AppConfig;
-import com.stq.service.IUserService;
+import com.stq.beanfactorypostprocessor.BeanFactoryPostProcessorConfig;
+import com.stq.beanfactorypostprocessor.MyBeanFactoryPostProcessor;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -10,9 +10,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public class AppConfigTest {
 	public static void main(String[] args) {
-		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-		IUserService bean = applicationContext.getBean(IUserService.class);
-		bean.getUserId();
+		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(BeanFactoryPostProcessorConfig.class);
+		applicationContext.addBeanFactoryPostProcessor(new MyBeanFactoryPostProcessor());
 	}
 
 }

@@ -75,6 +75,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
 /**
+ * 回调生命周期初始化或者销毁方法
+ * 1）初始化注解的回调：@PostConstruct
+ * 2）销毁的注解回调：@PreDestory
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
  * that supports common Java annotations out of the box, in particular the JSR-250
  * annotations in the {@code javax.annotation} package. These common Java
