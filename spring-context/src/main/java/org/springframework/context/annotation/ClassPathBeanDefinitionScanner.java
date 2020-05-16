@@ -262,6 +262,8 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	}
 
 	/**
+	 * 这个快就是扫描所有类的逻辑，然后把扫描的类封装为BeanDefinition,然后添加到工厂的
+	 * beanDefinitionMap集合中，就成了工厂的原材料，为以后工厂创建对象提供支持。
 	 * Perform a scan within the specified base packages,
 	 * returning the registered bean definitions.
 	 * <p>This method does <i>not</i> register an annotation config processor
@@ -273,17 +275,28 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
 		for (String basePackage : basePackages) {
+			/**
+			 * 这一段代码就是扫描指定包中的所有.class文件，然后将其封装成BeanDefinition.
+			 */
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+			/**
+			 * 循环上面查找出的BeanDefinition,然后添加一些属性后放到工厂的beanDefinitionMap集合中。
+			 */
 			for (BeanDefinition candidate : candidates) {
+				//填充当前BeanDefinition的scope属性
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
+				//获取beanName
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+				//设置是否自动装配
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+				//填充lazy/role/dependsOn/Primary/Description等属性
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+
 				if (checkCandidate(beanName, candidate)) {
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder =

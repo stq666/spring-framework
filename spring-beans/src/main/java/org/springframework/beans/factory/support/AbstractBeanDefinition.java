@@ -157,6 +157,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private Boolean lazyInit;
 	/**
 	 * 默认的注入类型是0，不支持外部注入
+	 * 1)no:不适用自动装配功能
+	 * 2）byName:通过Bean的属性名来实现自动装配
+	 * 3）byType:通过Bean的类型来实现自动装配
+	 * 4）controuctor:类似于byType,但是它是用构造函数的参数来实现自动装配
+	 * 5）autodetect:通过Bean类的反省机制（introspection）决定是使用controuctor,还是bytType
 	 */
 	private int autowireMode = AUTOWIRE_NO;
 	/**
@@ -193,17 +198,37 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private String factoryMethodName;
 
+	/**
+	 * 对应构造方法注入 constructor-arg
+	 * <bean class="Xxx">
+	 *   <constructor-arg></constructor-arg>
+	 *   <constructor-arg></constructor-arg>
+	 * </bean>
+	 */
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
-
+	/**
+	 * 对应属性注入proerty
+	 * <bean>
+	 *     <proerty></proerty>
+	 *     <proerty></proerty>
+	 * </bean>
+	 */
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
+	/**
+	 * 对应lookup-method和replace-method标签
+	 */
 	private MethodOverrides methodOverrides = new MethodOverrides();
-
+	/**
+	 * 对应init-method方法
+	 */
 	@Nullable
 	private String initMethodName;
-
+	/**
+	 * 对应destroy-method方法
+	 */
 	@Nullable
 	private String destroyMethodName;
 

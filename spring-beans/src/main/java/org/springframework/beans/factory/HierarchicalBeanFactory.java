@@ -19,6 +19,7 @@ package org.springframework.beans.factory;
 import org.springframework.lang.Nullable;
 
 /**
+ * 具有分层效果的BeanFactory,它是BeanFactory的子接口
  * Sub-interface implemented by bean factories that can be part
  * of a hierarchy.
  *
