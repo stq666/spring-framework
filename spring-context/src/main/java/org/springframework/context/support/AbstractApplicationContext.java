@@ -547,8 +547,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 * 1）增加类加载器
 			 * 2）设置表达式的解析器：StandardBeanExpressionResolver
 			 * 3）设置资源的注册器：ResourceEditorRegistrar
-			 * 4）设置一个bean后置处理器：ApplicationContextAwareProcessor，
-			 * 5）
+			 * 4）增加一个BeanPostProcessor：ApplicationContextAwareProcessor，
+			 * 5）增加一个BeanPostProcessor: ApplicationListenerDetector
+			 * 6）
+			 * 7）向单实例池singletonObjects中添加Environment
+			 * 8）向单实例池singletonObjects中添加：SystemProperties
+			 * 9）向单实例池singletonObjects中添加：SystemEnvironment
 			 */
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
@@ -566,7 +570,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * 这一步会扫描和解析所有的类，并将解析到的类的信息封装到BeanDefinition对象中，
 				 * 然后将BeanDefinition存储到beanDefinitionMap集合中。
 				 *
-				 * 所有的BeanFactoryPostProcessor的在这一步添加到单例池的
+				 * 所有的BeanFactoryPostProcessor的在这一步添加到单例池的（调用了getBean()方法）
 				 */
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
@@ -583,7 +587,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * 3）第三添加既没有实现PriorityOrdered，也没有实现Ordered的BeanPostProcessor
 				 * 4）最后添加实现MergedBeanDefinitionPostProcessor接口的
 				 *
-				 * 所有的BeanPostProcess在这一步添加到单例池的
+				 * 所有的BeanPostProcess在这一步添加到单例池的(调用了getBean()方法)
 				 */
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);

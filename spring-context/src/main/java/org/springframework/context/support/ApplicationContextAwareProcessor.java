@@ -81,7 +81,19 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 		this.embeddedValueResolver = new EmbeddedValueResolver(applicationContext.getBeanFactory());
 	}
 
-
+	/**
+	 * TODO 疑惑？？？，
+	 * 为什么EnvironmentAware/EmbeddedValueResolverAware/ResourceLoaderAware
+	 *      /ApplicationEventPublisherAware/MessageSourceAware/ApplicationContextAware
+	 * 这几个XxxAware放到BeanPostProcessor中，
+	 * 而BeanNameAware/BeanClassLoaderAware/BeanFactoryAware放到了invodeAware()方法中。
+	 *
+	 *
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	@Nullable
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
