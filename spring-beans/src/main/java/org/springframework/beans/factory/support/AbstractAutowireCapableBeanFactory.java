@@ -514,6 +514,34 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 为什么不能生成代理对象，不管是我们的JDK动态代理还是cglib代理都不会在此进行代理，
 			 * 因为我们真实的对象还没有生成，所以不会在这里生成代理对象，那么在这一步是我们
 			 * aop和事务的关键，因为在这一步解析我们aop切面信息进行缓存
+			 *
+			 * 这一步会调用实现了InstantiationAwareBeanPostProcessor接口的BeanPostProcessor
+			 * 那么哪些类实现了这个类呢?
+			 * 1)InstantiationAwareBeanPostProcessorAdapter(抽象的适配)
+			 * 2）ConfigurationClassPostProcessor.ImportAwareBeanPostProcessor
+			 * 3）AutowiredAnnotationBeanPostProcessor
+			 * 4）CommonAnnotationBeanPostProcessor
+			 * 5）AnnotationAwareAspectJAutoProxyCreator
+			 *
+			 * 这个方法会遍历所有的BeanPostProcessor,只有实现了 InstantiationAwarePostProcessor 的才会操作。
+			 * 会执行InstantiationAwarePostProcessor#postProcessBeforeInstantiation()方法。
+			 * 这个方法会在new对象前调用。
+			 * 1）InstantiationAwareBeanPostProcessorAdapter#postProcessorBeforeInstantiation()-->return null;
+			 * 2)ConfigurationClassPostProcessor.ImportAwareBeanPostProcessor并没有实现这个方法，说明在它的父类中。
+			 *   它的父类是InstantiationAwareBeanPostProcessorAdapter。如1）
+			 * 3)AutowireAnnotationBeanPostProcessor这个类也没有实现这个方法，说明在它的父类中。
+			 *   它的父类是InstantiationAwareBeanPostProcessorAdapter。如1）
+			 * 4）CommonAnnotationBeanPostProcessor#postProcessBeforeInstantiation()-->return null;
+			 * 5）AnnotationAwareAspectJAutoProxyCreator 这个类也没有实现这个方法，说明在它的父类中。
+			 *     -->AspectJAwareAdvisorAutoProxyCreator
+			 *        -->AbstractAdvisorAutoProxyCreator
+			 *           -->AbstractAutoProxyCreator#postProcessBeforeInstantiation()--> return not null;
+			 * 从这5个类中，我们知道前4个类是在AnnotationApplicationContext#构造方法#this()中注册的。
+			 * 但是这4个类中都是返回null,说明并没有什么业务逻辑。
+			 * AnnotationAwareAspectJAutoProxyCreator是我们在配置类中添加了注解@EnableAspectJAutoProxy 后才会将这个
+			 * BeanPostProcessor注册到容器中，而这个注解是开启Aspect AOP的，
+			 * 总结：从上面分析可知，在new对象之前，调用resolveBeforeInstantiation()方法是为了AOP准备一些工作的。
+			 * 如果上面的方法返回的不会null，则会执行InstantiationAwarePostProcessor#postProcessAfterInstantiation()方法
 			 */
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);

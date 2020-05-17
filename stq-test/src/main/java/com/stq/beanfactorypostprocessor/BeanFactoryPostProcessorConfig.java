@@ -3,6 +3,7 @@ package com.stq.beanfactorypostprocessor;
 import com.stq.beanfactorypostprocessor.model.Car;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan(basePackages = "com.stq.beanfactorypostprocessor")
-@Import(Car.class)
+@EnableAspectJAutoProxy
 public class BeanFactoryPostProcessorConfig {
 
 }

@@ -261,6 +261,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			 *    3)Advisor
 			 *    4)AopInfrastructureBean
 			 * 2）判断是否应该跳过，什么时候应该跳过呢？
+			 *    1）查找出所有的切面，然后找到给定的bean是否是切面，如果是返回true
+			 *    2）如果有注解@Aspect也会返回true。
+			 *
 			 *
 			 */
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
