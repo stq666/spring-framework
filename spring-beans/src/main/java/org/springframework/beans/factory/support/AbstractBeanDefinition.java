@@ -192,9 +192,16 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean lenientConstructorResolution = true;
 
+	/**
+	 * 定义创建该Bean对象的工厂类，如果使用了factory-bean,则beanClass无效。
+	 */
 	@Nullable
 	private String factoryBeanName;
 
+	/**
+	 * 定义创建该Bean对象的工厂方法，它用于上面factoryBeanName，表示这个Bean是通过
+	 * 工厂方法创建的，此时beanClass无效
+	 */
 	@Nullable
 	private String factoryMethodName;
 
@@ -208,7 +215,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 	/**
-	 * 对应属性注入proerty
+	 * 用于封装<property>标签信息的，其实类里面就是一个list,list里面是PropertyValue
 	 * <bean>
 	 *     <proerty></proerty>
 	 *     <proerty></proerty>

@@ -13,4 +13,5 @@ import org.springframework.context.annotation.Import;
 @ComponentScan(basePackages = "com.stq.beanfactorypostprocessor")
 @Import(Car.class)
 public class BeanFactoryPostProcessorConfig {
+
 }

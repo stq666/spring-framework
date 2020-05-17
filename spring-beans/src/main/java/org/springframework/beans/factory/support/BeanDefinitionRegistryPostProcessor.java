@@ -42,6 +42,9 @@ public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProc
 	 *  registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 	 *  所有我们可以把修改的BeanDefinition重新注册到beanDefinitionMap中去
 	 *
+	 * 通过这个方法我们可以获取到一个BeanDefinitionRegistry对象，获取到这个对象就可以获取到这个
+	 * 对象中注册的所有BeanDefinition对象，我们拥有了这个对象就可以对里面的所有BeanDefinition对象修改和新增操作。
+	 *
 	 * Modify the application context's internal bean definition registry after its
 	 * standard initialization. All regular bean definitions will have been loaded,
 	 * but no beans will have been instantiated yet. This allows for adding further

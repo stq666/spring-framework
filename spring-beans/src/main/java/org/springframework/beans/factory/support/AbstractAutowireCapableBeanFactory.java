@@ -1222,7 +1222,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
-		//首先从BeanDefinition获取到beanClass对象
+		//通过反射获取Class对象
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
@@ -1234,8 +1234,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
-
+		//判断是否配置了factory-method方法或者@Bean注解（@Bean注解底层和调用factory-method一样）
 		if (mbd.getFactoryMethodName() != null) {
+			/**
+			 * 反射调用factory-method方法，该方法会返回一个自定义创建的实例，然后return,
+			 * 后面的实例化过程就不会走了。
+			 */
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
@@ -1252,6 +1256,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (resolved) {
 			if (autowireNecessary) {
+				//
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
@@ -1261,6 +1266,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		/**
 		 * 第2次调用后置处理器就在determineConstructorsFromBeanPostProcessors()方法中，
 		 * 主要用于推断构造方法
+		 * 获取所有的BeanPostProcessor接口类型的对象，然后判断是否是SmartInstantiationAwareBeanPostProcessor,
+		 * 然后循环调用determineCandidateConstructors方法，该方法的作用是获取有@Autowired注解的构造函数。
 		 */
 		// Candidate constructors for autowiring?
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
@@ -1272,9 +1279,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Preferred constructors for default construction?
 		ctors = mbd.getPreferredConstructors();
 		if (ctors != null) {
+			/**
+			 * 1）构造函数有了
+			 */
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
-
+		//无参构造函数的实例化，大部分情况会走这种实例化
 		// No special handling: simply use no-arg constructor.
 		return instantiateBean(beanName, mbd);
 	}
@@ -1389,6 +1399,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 *
 	 * Instantiate the bean using a named factory method. The method may be static, if the
 	 * mbd parameter specifies a class, rather than a factoryBean, or an instance variable
 	 * on a factory object itself configured using Dependency Injection.
