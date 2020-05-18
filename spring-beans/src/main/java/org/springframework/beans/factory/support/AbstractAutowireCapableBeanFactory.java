@@ -407,6 +407,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return initializeBean(beanName, existingBean, null);
 	}
 
+	/**
+	 * 1)ApplicationContextAwareProcessor 对某个Aware接口进行调用
+	 * 2）InitDestroyAnnotationBeanPostProcessor 对@PostConstructor方法进行调用
+	 * 3）ImportAwareBeanPostProcessor 对ImportAware类型实例setImportMetadata调用
+	 */
 	@Override
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
@@ -626,8 +631,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (!mbd.postProcessed) {
 				try {
 					/**
-					 * 第3次调用后置处理器
-					 * 1）通过后置处理器来合并之后的BeanDefinition---目标
+					 * 第3次调用后置处理器：对类注解的装配过程。
+					 * 1）CommonAnnotationBeanPostProcessor会调用，支持@PostConstruct/@PreDestory/@Resource注解
+					 * 2）AutowireAnnotationBeanPostProcessor会调用，支持@Autowired/@Value注解
 					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
@@ -1024,7 +1030,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * 第四次调用后置处理器
+	 * 第四次调用后置处理器【AnnotationAspectJAutoProxyCreator】
 	 * Obtain a reference for early access to the specified bean,
 	 * typically for the purpose of resolving a circular reference.
 	 * @param beanName the name of the bean (for error handling purposes)
@@ -1293,7 +1299,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		/**
 		 * 第2次调用后置处理器就在determineConstructorsFromBeanPostProcessors()方法中，
-		 * 主要用于推断构造方法
+		 * 主要用于推断构造方法【AutowireAnnotationBeanPostProcessor】
 		 * 获取所有的BeanPostProcessor接口类型的对象，然后判断是否是SmartInstantiationAwareBeanPostProcessor,
 		 * 然后循环调用determineCandidateConstructors方法，该方法的作用是获取有@Autowired注解的构造函数。
 		 */

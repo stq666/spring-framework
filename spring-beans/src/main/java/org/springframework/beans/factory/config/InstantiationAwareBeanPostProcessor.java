@@ -82,6 +82,14 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	}
 
 	/**
+	 * 当对象实例化(new)后，通过一个构造函数或者工厂方法执行的操作，这个操作动作在填充属性之前。
+	 * 参数：
+	 * 1）bean:刚被new的对象，还没有填充属性。
+	 * 2）beanName:
+	 * 返回值：
+	 * true:如果返回true，会继续填充属性。
+	 * false:如果返回false：属性填充会被跳过，后续的任何InstantiationAwareBeanPostProcessor也会被禁止。
+	 * 一般情况下此方法返回true。
 	 * Perform operations after the bean has been instantiated, via a constructor or factory method,
 	 * but before Spring property population (from explicit properties or autowiring) occurs.
 	 * <p>This is the ideal callback for performing custom field injection on the given bean
