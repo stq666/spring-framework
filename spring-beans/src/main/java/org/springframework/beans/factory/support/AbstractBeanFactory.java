@@ -1780,6 +1780,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 1）判断name是否以&开头，如果是以&开头，则直接返回FactoryBean对象。
+	 * 2）判断是否是FactoryBean类型,如果不是，则直接返回
+	 * 3）如果是FactoryBean类型，并且name又没有以&开头，则是获取FactoryBean#getObject()返回的对象。
+	 *    3.1）首先从缓存中获取对象，这个缓存是存放FactoryBean#getObject()创建的对象的：
+	 *         这个缓存是factoryBeanObjectCache。
+	 *    3.2）如果缓存中存在则直接返回，
+	 *    3.3）如果缓存中不存在，则调用FactoryBean#getObject()方法获取对象，
+	 *        3.3.1）如果这个对象不需要代理，添加到factoryBeanObjectCache中，然后直接返回，
+	 *        3.3.2）如果这个对象需要代理，则通过BeanPostProcessor#postAfterInitial()方法获取到
+	 *               代理对象，添加到factoryBeanObjectCache集合中，然后返回。
 	 * Get the object for the given bean instance, either the bean
 	 * instance itself or its created object in case of a FactoryBean.
 	 * @param beanInstance the shared bean instance
@@ -1790,12 +1800,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected Object getObjectForBeanInstance(
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
-
+		//判断name是否以&开头的，以&开头的说明获取的FactoryBean本身
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
 			}
+			//如果以&开头，但是又不属于FactoryBean,则直接抛出异常。
 			if (!(beanInstance instanceof FactoryBean)) {
 				throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
 			}
