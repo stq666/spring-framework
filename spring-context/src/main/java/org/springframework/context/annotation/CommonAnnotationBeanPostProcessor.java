@@ -291,10 +291,22 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		}
 	}
 
-
+	/**
+	 * 1）扫描类里面的方法和属性
+	 * 2）判断属性和方法中是否又@PostConstruct/@PreDestroy/@Resource注解
+	 *    2.1)@PostConstruct只能添加到方法上
+	 *    2.2）@PreDestroy只能添加到方法上
+	 *    2.3）@Resource可以添加到类、属性、方法上，
+	 * 3）如果属性和方法中存在上面3个注解则封装成一个类。
+	 *    3.1）将有注解@PostConstruct的方法封装成LifecycleElement对象，保存到LifecycleMetadata的initMethods集合中
+	 *    3.2）将有注解@PreDestory的方法封装成LifecycleElement对象，保存到LifecycleMetadata的destroyMethods集合中
+	 *    3.3）将有注解@Resource的类或方法或属性封装成InjectedElement对象，保存到InjectionMetadata的injectedElements集合中
+	 */
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+		//扫描 @PostConstruct、@PreDestory
 		super.postProcessMergedBeanDefinition(beanDefinition, beanType, beanName);
+		//扫描 @Resource
 		InjectionMetadata metadata = findResourceMetadata(beanName, beanType, null);
 		metadata.checkConfigMembers(beanDefinition);
 	}
