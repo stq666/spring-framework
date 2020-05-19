@@ -633,8 +633,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				try {
 					/**
 					 * 第3次调用后置处理器：对类注解的装配过程。
-					 * 1）CommonAnnotationBeanPostProcessor会调用，支持@PostConstruct/@PreDestory/@Resource注解
-					 * 2）AutowireAnnotationBeanPostProcessor会调用，支持@Autowired/@Value注解
+					 *
+					 * 1）CommonAnnotationBeanPostProcessor会调用postProcessorMergedBeanDefinition()，支持@PostConstruct/@PreDestory/@Resource注解
+					 *     1.1)@PostConstruct封装成LifecycleElement,然后保存到LifecycleMetadata类的initMethods集合中。
+					 * 	   1.2)@PreDestory封装成LifecycleElement,然后保存到LifecycleMetadata类的destoryMethods集合中。
+					 * 	   1.3）@Resource封装成InjectedElement,然后保存到InjectionMedata类的injectedElements集合中。
+					 * 2）AutowireAnnotationBeanPostProcessor会调用，支持@Autowired/@Value/@Inject注解
+					 *     2.1）@Autowired封装成InjectedElement,然后保存到InjectionMedata类的injectedElements集合中。
+					 *     2.2）@Value封装成InjectedElement,然后保存到InjectionMedata类的injectedElements集合中。
+					 *     2.3）@Inject封装成InjectedElement,然后保存到InjectionMedata类的injectedElements集合中。
+					 *         如果使用@Inject注解，需要添加javax.injects包
 					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}

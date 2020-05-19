@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.inject.Inject;
 
 /**
  * @author stqsht@163.com
@@ -12,7 +13,8 @@ import javax.annotation.Resource;
  */
 @Component
 public class Car implements InitializingBean {
-	@Resource
+
+	@Inject
 	Coffee coffee;
 
 	@PostConstruct
