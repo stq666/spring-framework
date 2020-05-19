@@ -656,7 +656,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
-		//判断是否允许循环依赖
+		/**
+		 * 判断是否允许循环依赖,三个条件必须满足
+		 * 1）当前对象必须是单例的。
+		 * 2）allowCircularReferences必须为true，默认为true。
+		 * 3）在getSingleton(beanName,ObjectFactory)中将beanName添加到singletonsCurrentlyInCreation
+		 * 从这3个条件中可以看出，只有第2个条件我们可以自动修改。
+		 * 面试题如下：默认情况下，spring是否能够循环依赖，我们怎么修改禁止循环依赖。
+		 * 答：
+		 */
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
