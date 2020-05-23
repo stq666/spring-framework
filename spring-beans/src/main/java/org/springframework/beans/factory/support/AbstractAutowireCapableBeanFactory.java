@@ -608,7 +608,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 第2次调用后置处理器
 			 * 1）创建实例化对象
 			 * 创建bean实例，并将实例包裹在 BeanWrapper 实现类对象中返回，
-			 * createInstance中包含三种创建bean实例的方式：
+			 * createBeanInstance 中包含三种创建bean实例的方式：
 			 * 1. 通过工厂方法创建bean实例
 			 * 2. 通过构造方法自动注入（autowire by constructor）的方式创建bean实例
 			 * 3. 通过无参构造方法创建 bean 实例
@@ -1488,6 +1488,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 填充属性
 	 * Populate the bean instance in the given BeanWrapper with the property values
 	 * from the bean definition.
 	 * @param beanName the name of the bean
@@ -1506,7 +1507,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				return;
 			}
 		}
-
+		/**
+		 * 这个postProcessorAfterInstantiation()方法一般会返回true，
+		 * 如果返回false，则会停止属性的注入
+		 */
 		// Give any InstantiationAwareBeanPostProcessors the opportunity to modify the
 		// state of the bean before properties are set. This can be used, for example,
 		// to support styles of field injection.
@@ -1575,6 +1579,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 按照byName进行装配。
 	 * Fill in any missing property values with references to
 	 * other beans in this factory if autowire is set to "byName".
 	 * @param beanName the name of the bean we're wiring up.

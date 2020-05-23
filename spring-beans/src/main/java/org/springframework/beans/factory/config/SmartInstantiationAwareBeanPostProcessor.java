@@ -67,6 +67,8 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	}
 
 	/**
+	 * 获取提前暴露的对象，这个对象还不是完整的对象，属性都没有填充和初始化。
+	 * 如果需要代理，那么提前暴露的对象也应该是代理对象。
 	 * Obtain a reference for early access to the specified bean,
 	 * typically for the purpose of resolving a circular reference.
 	 * <p>This callback gives post-processors a chance to expose a wrapper

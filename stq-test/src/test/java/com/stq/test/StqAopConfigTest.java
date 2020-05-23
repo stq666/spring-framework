@@ -1,5 +1,6 @@
 package com.stq.test;
 
+import com.stq.aop.IPerson;
 import com.stq.aop.Person;
 import com.stq.aop.StqAopConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -12,7 +13,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class StqAopConfigTest {
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(StqAopConfig.class);
-		Person bean = applicationContext.getBean(Person.class);
+		IPerson bean = (IPerson) applicationContext.getBean("person");
 		bean.test();
 	}
 }

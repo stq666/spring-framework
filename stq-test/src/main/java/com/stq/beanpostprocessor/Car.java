@@ -1,6 +1,7 @@
 package com.stq.beanpostprocessor;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -14,7 +15,7 @@ import javax.inject.Inject;
 @Component
 public class Car implements InitializingBean {
 
-	@Inject
+	@Autowired
 	Coffee coffee;
 
 	@PostConstruct

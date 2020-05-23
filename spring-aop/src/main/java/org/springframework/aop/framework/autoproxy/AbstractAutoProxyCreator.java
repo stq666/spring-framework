@@ -51,6 +51,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ *
+ * 1）用AOP代理包装合适的bean,在调用bean本身之前委托给指定的拦截器
+ * 2）
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
  * that wraps each eligible bean with an AOP proxy, delegating to specified interceptors
  * before invoking the bean itself.
@@ -233,6 +236,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return null;
 	}
 
+	/**
+	 *
+	 * 提前暴露对象，如果需要代理，那么提前暴露的对象也应该是一个代理。
+	 * @return
+	 */
 	@Override
 	public Object getEarlyBeanReference(Object bean, String beanName) {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);

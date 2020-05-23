@@ -11,8 +11,10 @@ import javax.annotation.Resource;
  * @date 2020-05-18 22:10
  */
 @Component
-public class Person {
-	public void test(){
-		System.out.println("Person...test");
+public class Person implements IPerson{
+
+	@Override
+	public void test() {
+		System.out.println("test");
 	}
 }
