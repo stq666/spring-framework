@@ -1,4 +1,4 @@
-package com.stq.transaction;
+package com.stq.transaction.service;
 
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class OrderServiceImpl implements IOrderService {
 	@Override
-	@Transactional
-	@Pointcut
 	public void createOrder() {
 
 	}

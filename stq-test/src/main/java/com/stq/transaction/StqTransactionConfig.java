@@ -1,8 +1,11 @@
 package com.stq.transaction;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.c3p0.jboss.C3P0PooledDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
@@ -10,6 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
 import javax.sql.DataSource;
+import java.beans.PropertyVetoException;
 
 /**
  * @author stqsht@163.com
@@ -18,7 +22,7 @@ import javax.sql.DataSource;
 @Configuration
 @ComponentScan(basePackages = {"com.stq.transaction"})
 @EnableTransactionManagement
-public class StqTransactionConfig implements TransactionManagementConfigurer {
+public class StqTransactionConfig {
 
 	/**
 	 * 配置一个数据源
@@ -26,19 +30,23 @@ public class StqTransactionConfig implements TransactionManagementConfigurer {
 	 * @return
 	 */
 	@Bean
-	public DataSource dataSource() {
-		//
-		return null;
-
+	public DataSource dataSource() throws PropertyVetoException {
+		ComboPooledDataSource dataSource = new ComboPooledDataSource();
+		dataSource.setUser("root");
+		dataSource.setPassword("123456");
+		dataSource.setDriverClass("com.mysql.jdbc.Driver");
+		dataSource.setJdbcUrl("jdbc:mysql://localhost:3306/stq");
+		return dataSource;
 	}
 
 	@Bean
-	public PlatformTransactionManager txManager() {
+	public PlatformTransactionManager platformTransactionManager() throws PropertyVetoException {
 		return new DataSourceTransactionManager(dataSource());
 	}
 
-	@Override
-	public PlatformTransactionManager annotationDrivenTransactionManager() {
-		return txManager();
+	@Bean
+	public JdbcTemplate jdbcTemplate() throws PropertyVetoException {
+		return new JdbcTemplate(dataSource());
 	}
+
 }

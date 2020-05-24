@@ -294,7 +294,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * 第一步：this()-->new AnnotatedBeanDefinitionReader(this)
 	 * -->AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry)
 	 * -->registerAnnotationConfigProcessors()
-	 * 这个调用链会像beanDefinitionMap集合中注册6个类，分别如下：
+	 * 这个调用链会向beanDefinitionMap集合中注册6个类，分别如下：
 	 * 1）ConfigurationClassPostProcessor
 	 * 2）AutowiredAnnotationBeanPostProcessor
 	 * 3）CommonAnnotationBeanPostProcessor
