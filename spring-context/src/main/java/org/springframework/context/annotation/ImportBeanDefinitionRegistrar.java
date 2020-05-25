@@ -22,6 +22,8 @@ import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
+ * 在处理配置类（@Configuration）时通过实现这个接口可以向spring容器中注册组件。
+ * 在bean定义级别（和@Bean和instance级别不同）是非常有用和必须的
  * Interface to be implemented by types that register additional bean definitions when
  * processing @{@link Configuration} classes. Useful when operating at the bean definition
  * level (as opposed to {@code @Bean} method/instance level) is desired or necessary.

@@ -425,6 +425,9 @@ import org.springframework.stereotype.Component;
 public @interface Configuration {
 
 	/**
+	 *  1）为我们的配置类指定一个名称，如果没有指定，则会通过类名自动生成。
+	 *  2）这个自定义名称只用在@Configuration注解类自动扫描或者通过 AnnotationConfigApplicationContext 直接提供，
+	 *    传统的xml配置方式，name/id将优先使用
 	 * Explicitly specify the name of the Spring bean definition associated with the
 	 * {@code @Configuration} class. If left unspecified (the common case), a bean
 	 * name will be automatically generated.
@@ -440,6 +443,8 @@ public @interface Configuration {
 	String value() default "";
 
 	/**
+	 *  1）指定@Bean注解的方法是否需要代理来执行bean的生命周期，如果一个类中有@Configuration注解，那么是通过代理来执行的。
+	 *
 	 * Specify whether {@code @Bean} methods should get proxied in order to enforce
 	 * bean lifecycle behavior, e.g. to return shared singleton bean instances even
 	 * in case of direct {@code @Bean} method calls in user code. This feature

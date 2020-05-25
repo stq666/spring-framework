@@ -36,12 +36,14 @@ public class StqTransactionConfig {
 		dataSource.setPassword("123456");
 		dataSource.setDriverClass("com.mysql.jdbc.Driver");
 		dataSource.setJdbcUrl("jdbc:mysql://localhost:3306/stq");
+		System.out.println(dataSource);
 		return dataSource;
 	}
 
 	@Bean
 	public PlatformTransactionManager platformTransactionManager() throws PropertyVetoException {
-		return new DataSourceTransactionManager(dataSource());
+		DataSource dataSource = dataSource();
+		return new DataSourceTransactionManager(dataSource);
 	}
 
 	@Bean

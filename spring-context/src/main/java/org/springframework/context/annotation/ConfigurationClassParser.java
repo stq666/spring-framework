@@ -88,7 +88,7 @@ import org.springframework.util.StringUtils;
 /**
  * Parses a {@link Configuration} class definition, populating a collection of
  * {@link ConfigurationClass} objects (parsing a single Configuration class may result in
- * any number of ConfigurationClass objects because one Configuration class may import
+ * any number of ConfigurationC lass objects because one Configuration class may import
  * another using the {@link Import} annotation).
  *
  * <p>This class helps separate the concern of parsing the structure of a Configuration
@@ -265,12 +265,20 @@ class ConfigurationClassParser {
 	protected final SourceClass doProcessConfigurationClass(
 			ConfigurationClass configClass, SourceClass sourceClass, Predicate<String> filter)
 			throws IOException {
-
+		/**
+		 *  判断当前类上是否有 @Component 注解
+		 *  如果存在则递归解析内部类，这样递归
+		 *     -->processConfigurationClass
+		 *        --->doProcessConfigurationClass
+		 */
 		if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
 			// Recursively process any member (nested) classes first
 			processMemberClasses(configClass, sourceClass, filter);
 		}
-
+		/**
+		 *  判断当前类上是否有 @PropertySources @PropertySource 注解
+		 *  如果存在则解析并加载properties文件
+		 */
 		// Process any @PropertySource annotations
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
@@ -283,7 +291,16 @@ class ConfigurationClassParser {
 						"]. Reason: Environment must implement ConfigurableEnvironment");
 			}
 		}
-
+		/**
+		 *  判断当前类上是否有 @ComponentScans @ComponentScan 注解
+		 *  1）循环获componentScans
+		 *  2）获取到被扫描包的所有类并封装到BeanDefinitionHolder
+		 *  3）遍历查找到的所有BeanDefinitionHolder，然后判断是否存在@Configuration类
+		 *     如果存在则递归调用解析方法
+		 *       -->parse
+		 *          -->processConfigurationClass
+		 *             -->doProcessConfigurationClass
+		 */
 		// Process any @ComponentScan annotations
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
@@ -305,10 +322,17 @@ class ConfigurationClassParser {
 				}
 			}
 		}
-
+		/**
+		 * 处理当前类上的 @Import 注解
+		 * 1）如果@Import导入的是 ImportSelector 类型
+		 * 2）如果@Import导入的是 ImportBeanDefinitionRegistrar 类型
+		 * 3）如果@Import导入的是普通的类型（不是ImportSelector和ImportBeanDefinitionRegistrar类型）
+		 */
 		// Process any @Import annotations
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
-
+		/**
+		 *  处理当前类上的 @ImportResource 注解
+		 */
 		// Process any @ImportResource annotations
 		AnnotationAttributes importResource =
 				AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);
@@ -320,16 +344,22 @@ class ConfigurationClassParser {
 				configClass.addImportedResource(resolvedResource, readerClass);
 			}
 		}
-
+		/**
+		 * 处理当前类上的 @Bean 注解
+		 */
 		// Process individual @Bean methods
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
-
+		/**
+		 * 处理当前类所有实现的接口的默认方法实现
+		 */
 		// Process default methods on interfaces
 		processInterfaces(configClass, sourceClass);
-
+		/**
+		 * 如果注解类上存在父类，则递归处理父类上的，因为此方法返回值不为空会继续do{}while(source!=null)
+		 */
 		// Process superclass, if any
 		if (sourceClass.getMetadata().hasSuperClass()) {
 			String superclass = sourceClass.getMetadata().getSuperClassName();
@@ -340,12 +370,13 @@ class ConfigurationClassParser {
 				return sourceClass.getSuperClass();
 			}
 		}
-
+		//如果没有父类，则此方法返回null，do{}while(source!=null)结束
 		// No superclass -> processing is complete
 		return null;
 	}
 
 	/**
+	 * 获取一个类上的所有内部类，然后递归进行解析
 	 * Register member (nested) classes that happen to be configuration classes themselves.
 	 */
 	private void processMemberClasses(ConfigurationClass configClass, SourceClass sourceClass,
@@ -355,6 +386,7 @@ class ConfigurationClassParser {
 		if (!memberClasses.isEmpty()) {
 			List<SourceClass> candidates = new ArrayList<>(memberClasses.size());
 			for (SourceClass memberClass : memberClasses) {
+				//如果当前内部类上有注解 @Configuration 并且内部类的className不等于外部类的className,则加到集合中
 				if (ConfigurationClassUtils.isConfigurationCandidate(memberClass.getMetadata()) &&
 						!memberClass.getMetadata().getClassName().equals(configClass.getMetadata().getClassName())) {
 					candidates.add(memberClass);
@@ -368,6 +400,7 @@ class ConfigurationClassParser {
 				else {
 					this.importStack.push(configClass);
 					try {
+						//递归处理内部类
 						processConfigurationClass(candidate.asConfigClass(configClass), filter);
 					}
 					finally {
