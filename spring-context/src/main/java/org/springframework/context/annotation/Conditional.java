@@ -23,12 +23,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 这个注解的作用：按照一定的条件进行判断，只有满足条件才能在容器中注册该组件。
  * Indicates that a component is only eligible for registration when all
  * {@linkplain #value specified conditions} match.
  *
  * <p>A <em>condition</em> is any state that can be determined programmatically
  * before the bean definition is due to be registered (see {@link Condition} for details).
- *
+ * @Conditionnal注解用到类上和方法上。
+ * 1）用在类上：
+ * 2）作为一个元注解：
+ * 2）用在方法上：
  * <p>The {@code @Conditional} annotation may be used in any of the following ways:
  * <ul>
  * <li>as a type-level annotation on any class directly or indirectly annotated with
@@ -38,6 +42,8 @@ import java.lang.annotation.Target;
  * <li>as a method-level annotation on any {@link Bean @Bean} method</li>
  * </ul>
  *
+ * 如果注解类(@Configuration)上被@Conditional标记，那么这个类上被@Bean注解的方法，
+ * @Import注解，@ComponentScan注解都会以条件为准。
  * <p>If a {@code @Configuration} class is marked with {@code @Conditional},
  * all of the {@code @Bean} methods, {@link Import @Import} annotations, and
  * {@link ComponentScan @ComponentScan} annotations associated with that

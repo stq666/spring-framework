@@ -266,7 +266,7 @@ class ConfigurationClassParser {
 			ConfigurationClass configClass, SourceClass sourceClass, Predicate<String> filter)
 			throws IOException {
 		/**
-		 *  判断当前类上是否有 @Component 注解
+		 *  判断当前类上是否有 @Component 注解(其中@Configuration的元注解上也存在@Component)
 		 *  如果存在则递归解析内部类，这样递归
 		 *     -->processConfigurationClass
 		 *        --->doProcessConfigurationClass
@@ -300,6 +300,7 @@ class ConfigurationClassParser {
 		 *       -->parse
 		 *          -->processConfigurationClass
 		 *             -->doProcessConfigurationClass
+		 *  shouldSkip():是判断@Conditional注解，如果条件满足则创建bean的定义，如果不满足则不创建。
 		 */
 		// Process any @ComponentScan annotations
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
@@ -381,12 +382,17 @@ class ConfigurationClassParser {
 	 */
 	private void processMemberClasses(ConfigurationClass configClass, SourceClass sourceClass,
 			Predicate<String> filter) throws IOException {
-
+		//获取sourceClass中的内部类
 		Collection<SourceClass> memberClasses = sourceClass.getMemberClasses();
 		if (!memberClasses.isEmpty()) {
 			List<SourceClass> candidates = new ArrayList<>(memberClasses.size());
 			for (SourceClass memberClass : memberClasses) {
 				//如果当前内部类上有注解 @Configuration 并且内部类的className不等于外部类的className,则加到集合中
+				/**
+				 * 1)判断类上是否有@Configuration、@Component、@ComponentScan、@Import、@ImportSoure,如果存在则返回true，
+				 *   或者判断方法上是否存在@Bean注解，如果存在则返回true
+				 * 2）内部类的className不能和它的外部类相同。
+				 */
 				if (ConfigurationClassUtils.isConfigurationCandidate(memberClass.getMetadata()) &&
 						!memberClass.getMetadata().getClassName().equals(configClass.getMetadata().getClassName())) {
 					candidates.add(memberClass);
@@ -467,6 +473,7 @@ class ConfigurationClassParser {
 
 
 	/**
+	 *  处理@PropertySource注解
 	 * Process the given <code>@PropertySource</code> annotation metadata.
 	 * @param propertySource metadata for the <code>@PropertySource</code> annotation found
 	 * @throws IOException if loading a property source failed

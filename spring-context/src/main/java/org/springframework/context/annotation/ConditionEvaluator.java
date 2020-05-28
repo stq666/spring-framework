@@ -72,6 +72,7 @@ class ConditionEvaluator {
 	}
 
 	/**
+	 *  这个方法就是判断是否跳过bean的定义，主要根据注解@Conditionanl注解进行判断
 	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
 	 * @param metadata the meta data
 	 * @param phase the phase of the call

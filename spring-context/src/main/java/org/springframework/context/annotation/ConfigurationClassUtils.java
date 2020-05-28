@@ -143,6 +143,9 @@ abstract class ConfigurationClassUtils {
 	}
 
 	/**
+	 * 1）判断类上是否有@Component/@ComponentScan/@Import/@ImportSource,如果有则返回true。
+	 *    因为@Configuration的元注解上是@Component，所以如果是@Configuration注解也会返回true
+	 * 2）判断方法上是否有@Bean注解，如果有则返回true
 	 * Check the given metadata for a configuration class candidate
 	 * (or nested component class declared within a configuration/component class).
 	 * @param metadata the metadata of the annotated class
