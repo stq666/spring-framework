@@ -36,6 +36,11 @@ public interface ConfigurationCondition extends Condition {
 
 
 	/**
+	 * 这是一个枚举类，主要判断在
+	 * 1）PARSE_CONFIGURATION：表示判断被@Configuration注解标注的类是否匹配Condition条件，
+	 *                        如果不匹配则被@Configuration注解标注的类不会被添加到Spring容器中。
+	 * 2）REGISTER_BEAN：表示判断常规的bean(非@Configuration)是否匹配Condition条件，这个条件将
+	 *                   不会对@Configuration注解标注的类进行条件判断
 	 * The various configuration phases where the condition could be evaluated.
 	 */
 	enum ConfigurationPhase {

@@ -194,6 +194,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * 定义创建该Bean对象的工厂类，如果使用了factory-bean,则beanClass无效。
+	 * 1）在使用factory-method时，替代class属性。
+	 * 2）若指定了这个属性，class属性将不会被使用。它必须设定为当前或父工厂中的bean名称，
+	 *    它包含相关的工厂方法。这使得工厂本身需要配置依赖注入，并使用一个实例方法（不是静态的）。
 	 */
 	@Nullable
 	private String factoryBeanName;
@@ -201,6 +204,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * 定义创建该Bean对象的工厂方法，它用于上面factoryBeanName，表示这个Bean是通过
 	 * 工厂方法创建的，此时beanClass无效
+	 * 1）工厂方法名用于创建对象
+	 * 2）若这个工厂方法需要参数的话，使用constructor-arg 元素来指定它的参数。
+	 * 3）自动装配不能用于工厂方法
+	 * 4）若class属性存在，那么这个工厂方法将是这个类内部的一个指向这个类的静态方法。
+	 * 5）
 	 */
 	@Nullable
 	private String factoryMethodName;

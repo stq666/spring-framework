@@ -222,6 +222,11 @@ class ConfigurationClassParser {
 
 
 	protected void processConfigurationClass(ConfigurationClass configClass, Predicate<String> filter) throws IOException {
+		/**
+		 * 这个判断非常的重要，主要判断注解@Condition是否匹配。
+		 * 1）如果匹配则继续创建进行bean定义
+		 * 2）如果不匹配，则说明不需要创建bean定义，直接返回即可。
+		 */
 		if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) {
 			return;
 		}

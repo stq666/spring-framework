@@ -79,10 +79,15 @@ class ConditionEvaluator {
 	 * @return if the item should be skipped
 	 */
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
+		//如果没有注解，或者注解上没有@Conditional，则返回false
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
-
+		/**
+		 * 如果没有传递@Condition注解在什么时候起作用，则会进行判断
+		 * 1）如果标注了@Configuration、@Component、@Import、@ImportSource、@Bean时会默认PARSE_CONFIGURATION
+		 * 2）其他则会被认为REGISTER_BEAN
+		 */
 		if (phase == null) {
 			if (metadata instanceof AnnotationMetadata &&
 					ConfigurationClassUtils.isConfigurationCandidate((AnnotationMetadata) metadata)) {
@@ -92,6 +97,7 @@ class ConditionEvaluator {
 		}
 
 		List<Condition> conditions = new ArrayList<>();
+		//获取@Conditional注解上的自定义条件
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
 			for (String conditionClass : conditionClasses) {
 				Condition condition = getCondition(conditionClass, this.context.getClassLoader());
