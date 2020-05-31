@@ -37,7 +37,6 @@ public class StqTransactionConfig {
 		dataSource.setPassword("123456");
 		dataSource.setDriverClass("com.mysql.jdbc.Driver");
 		dataSource.setJdbcUrl("jdbc:mysql://localhost:3306/stq");
-		System.out.println(dataSource);
 		return dataSource;
 	}
 

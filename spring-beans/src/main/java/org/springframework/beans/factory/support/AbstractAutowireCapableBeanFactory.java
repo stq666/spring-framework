@@ -503,6 +503,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
+		/**
+		 * 查找到lookup-method和replace-method
+		 */
 		// Prepare method overrides.
 		try {
 			mbdToUse.prepareMethodOverrides();
@@ -608,10 +611,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 第2次调用后置处理器
 			 * 1）创建实例化对象
 			 * 创建bean实例，并将实例包裹在 BeanWrapper 实现类对象中返回，
-			 * createBeanInstance 中包含三种创建bean实例的方式：
-			 * 1. 通过工厂方法创建bean实例
-			 * 2. 通过构造方法自动注入（autowire by constructor）的方式创建bean实例
-			 * 3. 通过无参构造方法创建 bean 实例
+			 * createBeanInstance 中包含四种创建bean实例的方式：
+			 * 1. 通过 Supplier 回调创建bean实例
+			 * 2. 通过工厂方法创建bean实例
+			 * 3. 通过构造方法自动注入（autowire by constructor）的方式创建bean实例
+			 * 4. 通过无参构造方法创建 bean 实例
 			 *
 			 * 若 bean 的配置信息中配置了 lookup-method 和 replace-method , 则会使用
 			 * CGLIB 增强bean实例。
@@ -1252,10 +1256,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * 此方法有3中方法创建bean实例：
-	 *
-	 * 1. 通过工厂方法创建bean实例
-	 * 2. 通过构造方法自动注入（autowire by constructor）的方式创建bean实例
-	 * 3. 通过无参构造方法创建 bean 实例
+	 * 1. 通过 Supplier 回调创建bean实例
+	 * 2. 通过工厂方法创建bean实例
+	 * 3. 通过构造方法自动注入（autowire by constructor）的方式创建bean实例
+	 * 4. 通过无参构造方法创建 bean 实例
 	 *
 	 * 若 bean 的配置信息中配置了 lookup-method 和 replace-method , 则会使用
 	 * CGLIB 增强bean实例。
@@ -1280,12 +1284,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
-
+		//1.如果存在Supplier，则通过回调get()方法创建实例。
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 		//判断是否配置了factory-method方法或者@Bean注解（@Bean注解底层和调用factory-method一样）
+		//2.通过工厂方法进行实例化，里面实例化的内容非常的复杂，请进入此方法看
 		if (mbd.getFactoryMethodName() != null) {
 			/**
 			 * 反射调用factory-method方法，该方法会返回一个自定义创建的实例，然后return,
@@ -1293,28 +1298,38 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 */
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
-
+		/**
+		 *
+		 */
 		// Shortcut when re-creating the same bean...
 		boolean resolved = false;
 		boolean autowireNecessary = false;
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
+					// 如果已缓存的解析的构造函数或者工厂方法不为空，则可以利用构造函数解析
+					// 因为需要根据参数确认到底使用哪个构造函数，该过程比较消耗性能，所有采用缓存机制
 					resolved = true;
 					autowireNecessary = mbd.constructorArgumentsResolved;
 				}
 			}
 		}
+		// 如果已经解析过，不需要再次解析
 		if (resolved) {
 			if (autowireNecessary) {
-				//
+				//构造函数自动注入进行实例化
+				//一个类有多个构造函数，每个构造函数都有不同的参数，所以需要根据参数锁定构造函数进行 bean 的实例化
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
+				//使用默认的无参构造方法实例化
 				return instantiateBean(beanName, mbd);
 			}
 		}
 		/**
+		 * 代码到这个地方说明缓存中没有存在已经解析的构造函数，所有需要通过参数去解析构造函数，
+		 * 这个工作交给了BeanPostProcessor的子类去完成。
+		 *
 		 * 第2次调用后置处理器就在determineConstructorsFromBeanPostProcessors()方法中，
 		 * 主要用于推断构造方法【AutowireAnnotationBeanPostProcessor】
 		 * 获取所有的BeanPostProcessor接口类型的对象，然后判断是否是SmartInstantiationAwareBeanPostProcessor,

@@ -376,6 +376,20 @@ class ConstructorResolver {
 	}
 
 	/**
+	 * 通过factory-method工厂方法的形式实例化指定的bean。
+	 * 1）确定工厂对象
+	 *    1）如果工厂对象为不为null，则通过getBean()获取到工厂对象，
+	 *      如<bean factory-bean="" factory-method=""></bean>
+	 *    2）如果工厂对象为null，则可能是一个静态工厂，对于静态工厂必须提供工厂类的全类名
+	 *      如<bean class="" factory-method=""></bean>
+	 * 2）构造参数的确认,工厂对象确定后，需要确定构造函数了，主要3种情况：
+	 *   2.1）explicitArgs：这个是我们调用doGetBean时传递过来的
+	 *   2.2）缓存中获取：
+	 *   2.3）配置文件中解析
+	 * 3）构造函数：上面一步的构造函数的参数已经确认完毕，接下来需要确认构造函数
+	 *   3.1）通过getCandidateMethods()获取到所有的构造方法，
+	 * 4）创建bean实例：
+	 *
 	 * Instantiate the bean using a named factory method. The method may be static, if the
 	 * bean definition parameter specifies a class, rather than a "factory-bean", or
 	 * an instance variable on a factory object itself configured using Dependency Injection.
@@ -401,6 +415,9 @@ class ConstructorResolver {
 		boolean isStatic;
 
 		String factoryBeanName = mbd.getFactoryBeanName();
+		/**
+		 * 如果factory-name不为空，则说明是实例工厂方法，
+		 */
 		if (factoryBeanName != null) {
 			if (factoryBeanName.equals(beanName)) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
@@ -413,7 +430,11 @@ class ConstructorResolver {
 			factoryClass = factoryBean.getClass();
 			isStatic = false;
 		}
+		/**
+		 * 静态工厂方法
+		 */
 		else {
+
 			// It's a static factory method on the bean class.
 			if (!mbd.hasBeanClass()) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
@@ -434,9 +455,11 @@ class ConstructorResolver {
 		else {
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
+				//获取已经缓存的构造函数或者工厂方法
 				factoryMethodToUse = (Method) mbd.resolvedConstructorOrFactoryMethod;
 				if (factoryMethodToUse != null && mbd.constructorArgumentsResolved) {
 					// Found a cached factory method...
+					//获取到已经解析的构造函数参数
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
 						argsToResolve = mbd.preparedConstructorArguments;
@@ -464,6 +487,7 @@ class ConstructorResolver {
 			}
 			if (candidates == null) {
 				candidates = new ArrayList<>();
+				//获取到所有的构造函数
 				Method[] rawCandidates = getCandidateMethods(factoryClass, mbd);
 				for (Method candidate : rawCandidates) {
 					if (Modifier.isStatic(candidate.getModifiers()) == isStatic && mbd.isFactoryMethod(candidate)) {

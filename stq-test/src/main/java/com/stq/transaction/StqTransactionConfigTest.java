@@ -10,7 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class StqTransactionConfigTest {
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(StqTransactionConfig.class);
-		Object shaotianqiang = applicationContext.getBean("stqTransactionConfig");
+		Object shaotianqiang = applicationContext.getBean("mySupplier");
 		System.out.println(shaotianqiang);
 	}
 }
